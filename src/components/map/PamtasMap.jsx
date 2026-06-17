@@ -126,8 +126,9 @@ export function PamtasMap({
         )}
       </MapContainer>
 
-      {/* Layer toggle controls — di dalam div relative tapi z-index tinggi */}
-      <div className="absolute bottom-4 left-2 z-[1000] pointer-events-auto">
+      {/* Layer toggle controls */}
+      <div className="absolute bottom-4 left-2 z-[2000] pointer-events-auto"
+        style={{ isolation: 'isolate' }}>
         <MapLayerControls />
       </div>
     </div>
