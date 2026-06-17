@@ -26,6 +26,15 @@ async function gasGet(action, params = {}) {
   if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
   const data = await res.json()
   if (data.error) throw new Error(data.error)
+
+  // Normalisasi field dari GAS ke format dashboard
+  if (action === 'getAllPos' && Array.isArray(data)) {
+    return data.map(normalizePos)
+  }
+  if (action === 'getAllPos' && data?.value) {
+    return data.value.map(normalizePos)
+  }
+
   return data
 }
 
@@ -48,6 +57,27 @@ async function gasPost(action, data) {
   const result = await res.json()
   if (result.error) throw new Error(result.error)
   return result
+}
+
+// ─── Normalisasi field dari Google Sheets → format dashboard ─────────────────
+
+function normalizePos(p) {
+  return {
+    ...p,
+    // Dashboard pakai jumlah_personel, GAS kirim kuat_pers
+    jumlah_personel: p.jumlah_personel ?? p.kuat_pers ?? 0,
+    // Alias field tambahan
+    kondisi_bangunan:  p.kondisi_bangunan  || '',
+    sumber_air:        p.sumber_air        || '',
+    sumber_listrik:    p.sumber_listrik    || '',
+    jaringan_gsm:      p.jaringan_gsm      || '',
+    jumlah_patok:      p.jumlah_patok      || 0,
+    kerawanan_utama:   p.kerawanan_utama   || '',
+    kecamatan:         p.kecamatan         || '',
+    provinsi:          p.provinsi          || '',
+    danssk:            p.danssk            || '',
+    dpp:               p.dpp               || '',
+  }
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────────

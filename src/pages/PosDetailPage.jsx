@@ -14,6 +14,7 @@ import { PhotoGallery } from '../components/ui/PhotoGallery'
 import { formatNumber } from '../utils/formatDate'
 
 const TABS = [
+  { id: 'info',       label: 'Info Pos',   icon: '◆' },
   { id: 'demografi',  label: 'Demografi',  icon: '◈' },
   { id: 'geodemo',    label: 'Geo-Demo-Konsos', icon: '◬' },
   { id: 'tokoh',      label: 'Tokoh',      icon: '◉' },
@@ -27,7 +28,7 @@ export default function PosDetailPage() {
   const navigate  = useNavigate()
   const { setSelectedPosId } = useApp()
 
-  const [activeTab, setActiveTab] = useState('demografi')
+  const [activeTab, setActiveTab] = useState('info')
 
   const { data: posList } = usePos()
   const pos = (posList || []).find(p => p.pos_id === posId)
@@ -136,6 +137,10 @@ export default function PosDetailPage() {
 
       {/* ── Tab content ────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto p-4">
+        {activeTab === 'info' && (
+          <InfoPosTab pos={pos} />
+        )}
+
         {activeTab === 'demografi' && (
           <DemografiTable demografi={demografi} loading={demLoading} />
         )}
@@ -196,6 +201,76 @@ function InfoPill({ label, value, color = '#00ff88', pulse }) {
       )}
       <span style={{ color: `${color}70` }} className="uppercase tracking-wider">{label}</span>
       <span className="font-mono font-bold" style={{ color }}>{value}</span>
+    </div>
+  )
+}
+
+function InfoPosTab({ pos }) {
+  if (!pos) return <div className="text-[rgba(200,214,229,0.3)] text-xs text-center py-16">Data pos tidak ditemukan</div>
+
+  const sections = [
+    {
+      title: 'IDENTITAS POS',
+      rows: [
+        { label: 'ID Pos',           value: pos.pos_id },
+        { label: 'Nama Pos',         value: pos.nama_pos },
+        { label: 'Lokasi Desa',      value: pos.lokasi_desa },
+        { label: 'Kecamatan',        value: pos.kecamatan },
+        { label: 'Kabupaten',        value: pos.kabupaten },
+        { label: 'Provinsi',         value: pos.provinsi },
+        { label: 'Koordinat',        value: pos.lat && pos.lng ? `${pos.lat}, ${pos.lng}` : '—' },
+        { label: 'Jumlah Patok',     value: pos.jumlah_patok ? `${pos.jumlah_patok} patok` : '—' },
+      ],
+    },
+    {
+      title: 'KOMANDAN & PERSONEL',
+      rows: [
+        { label: 'Komandan Pos',      value: pos.komandan_pos || '—' },
+        { label: 'Danssk',            value: pos.danssk || '—' },
+        { label: 'DPP',               value: pos.dpp || '—' },
+        { label: 'Kekuatan Personel', value: pos.jumlah_personel ? `${pos.jumlah_personel} orang` : '—' },
+      ],
+    },
+    {
+      title: 'FASILITAS & INFRASTRUKTUR',
+      rows: [
+        { label: 'Kondisi Bangunan', value: pos.kondisi_bangunan || '—' },
+        { label: 'Sumber Air',       value: pos.sumber_air || '—' },
+        { label: 'Sumber Listrik',   value: pos.sumber_listrik || '—' },
+        { label: 'Jaringan GSM',     value: pos.jaringan_gsm || '—' },
+      ],
+    },
+    {
+      title: 'KERAWANAN UTAMA',
+      rows: [
+        { label: 'Potensi Ancaman',  value: pos.kerawanan_utama || '—', highlight: true },
+      ],
+    },
+  ]
+
+  return (
+    <div className="space-y-4">
+      {sections.map(section => (
+        <div key={section.title} className="rounded-sm overflow-hidden"
+          style={{ border: '1px solid rgba(0,255,136,0.12)' }}>
+          <div className="px-3 py-2"
+            style={{ background: 'rgba(0,255,136,0.05)', borderBottom: '1px solid rgba(0,255,136,0.1)' }}>
+            <span className="text-[9px] font-bold tracking-[0.2em] uppercase"
+              style={{ color: 'rgba(0,255,136,0.7)' }}>{section.title}</span>
+          </div>
+          <div className="divide-y divide-[rgba(0,255,136,0.05)]">
+            {section.rows.map(row => (
+              <div key={row.label} className="flex items-start gap-3 px-3 py-2">
+                <span className="text-[10px] uppercase tracking-wider flex-shrink-0 w-36"
+                  style={{ color: 'rgba(200,214,229,0.35)' }}>{row.label}</span>
+                <span className={`text-[11px] font-medium flex-1 ${row.highlight ? 'text-[#ffaa00]' : 'text-[rgba(200,214,229,0.8)]'}`}>
+                  {row.value || '—'}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   )
 }
