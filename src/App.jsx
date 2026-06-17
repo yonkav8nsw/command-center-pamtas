@@ -6,6 +6,7 @@ import PosDetailPage        from './pages/PosDetailPage'
 import KerawananPage        from './pages/KerawananPage'
 import BinterPage           from './pages/BinterPage'
 import AdminPage            from './pages/AdminPage'
+import PanduanPage          from './pages/PanduanPage'
 import GrafikKerawananPage  from './pages/laporan/GrafikKerawananPage'
 import TimelineBinterPage   from './pages/laporan/TimelineBinterPage'
 import DataDemografiPage    from './pages/laporan/DataDemografiPage'
@@ -23,6 +24,7 @@ export default function App() {
             <Route path="/kerawanan"               element={<KerawananPage />} />
             <Route path="/binter"                  element={<BinterPage />} />
             <Route path="/admin"                   element={<AdminPage />} />
+            <Route path="/panduan"                 element={<PanduanPage />} />
             <Route path="/laporan/kerawanan"       element={<GrafikKerawananPage />} />
             <Route path="/laporan/binter"          element={<TimelineBinterPage />} />
             <Route path="/laporan/demografi"       element={<DataDemografiPage />} />
