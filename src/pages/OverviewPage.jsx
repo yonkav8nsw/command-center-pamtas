@@ -245,18 +245,22 @@ export default function OverviewPage() {
 /* ── STATUS PERSONEL panel ──────────────────────────────── */
 function PersonelPanel({ posList, loading, navigate }) {
   const totalPersonel = (posList || []).reduce((s, p) => s + (Number(p.jumlah_personel) || 0), 0)
-  const maxP = Math.max(...(posList || []).map(p => Number(p.jumlah_personel) || 0), 1)
 
   const top5 = [...(posList || [])]
     .sort((a, b) => (Number(b.jumlah_personel) || 0) - (Number(a.jumlah_personel) || 0))
     .slice(0, 5)
 
-  const kabData = ['Nunukan', 'Malinau'].map(kab => ({
-    kab,
-    count: (posList || []).filter(p => p.kabupaten === kab).length,
-    personel: (posList || []).filter(p => p.kabupaten === kab)
-      .reduce((s, p) => s + (Number(p.jumlah_personel) || 0), 0),
-  }))
+  // Kelompokkan per kabupaten dari data aktual
+  const kabMap = {}
+  ;(posList || []).forEach(p => {
+    const kab = (p.kabupaten || 'Lainnya').replace('Kab. ', '')
+    if (!kabMap[kab]) kabMap[kab] = { count: 0, personel: 0 }
+    kabMap[kab].count++
+    kabMap[kab].personel += Number(p.jumlah_personel) || 0
+  })
+  const kabData = Object.entries(kabMap)
+    .sort((a, b) => b[1].personel - a[1].personel)
+    .slice(0, 2)
 
   if (loading) {
     return (
@@ -287,9 +291,9 @@ function PersonelPanel({ posList, loading, navigate }) {
           </p>
         </div>
 
-        {/* Kabupaten pills */}
+        {/* Kabupaten pills — dari data aktual */}
         <div className="flex flex-col gap-1 items-end">
-          {kabData.map(({ kab, count, personel }) => (
+          {kabData.map(([kab, { count, personel }]) => (
             <div key={kab} className="flex items-center gap-1.5 px-2 py-1 rounded-sm"
               style={{ background: 'rgba(68,136,255,0.07)', border: '1px solid rgba(68,136,255,0.18)' }}>
               <div className="text-right">
@@ -309,15 +313,15 @@ function PersonelPanel({ posList, loading, navigate }) {
       {/* ── Divider ── */}
       <div className="h-px" style={{ background: 'rgba(0,255,136,0.08)' }} />
 
-      {/* ── Top 5 bar chart ── */}
+      {/* ── Top 5 bar chart — % dari TOTAL personel, bukan dari max ── */}
       <div className="space-y-1.5">
         <p className="text-[7px] uppercase tracking-[0.2em] px-0.5"
-          style={{ color: 'rgba(200,214,229,0.25)' }}>Kekuatan per Pos</p>
+          style={{ color: 'rgba(200,214,229,0.25)' }}>Kekuatan per Pos (% dari total)</p>
         {top5.map((pos, i) => {
           const num    = Number(pos.jumlah_personel) || 0
-          const pct    = Math.round((num / maxP) * 100)
-          const posNo  = pos.pos_id.replace('POS-', '')
-          const accent = i === 0 ? '#00ff88' : i === 1 ? 'rgba(0,255,136,0.65)' : 'rgba(0,255,136,0.4)'
+          const pct    = totalPersonel > 0 ? Math.round((num / totalPersonel) * 100) : 0
+          const posNo  = pos.pos_id === 'KOTIS' ? '★' : pos.pos_id.replace('POS-', '')
+          const accent = i === 0 ? '#ffd700' : i === 1 ? '#00ff88' : i === 2 ? 'rgba(0,255,136,0.65)' : 'rgba(0,255,136,0.4)'
           return (
             <div key={pos.pos_id}
               className="flex items-center gap-2 cursor-pointer group"
@@ -341,12 +345,12 @@ function PersonelPanel({ posList, loading, navigate }) {
                   style={{
                     width: `${pct}%`,
                     background: `linear-gradient(90deg, ${accent}, ${accent}88)`,
-                    boxShadow: i === 0 ? '0 0 6px rgba(0,255,136,0.4)' : 'none',
+                    boxShadow: i === 0 ? `0 0 6px ${accent}66` : 'none',
                   }} />
               </div>
-              {/* Value */}
-              <span className="font-mono text-[9px] font-bold w-5 text-right flex-shrink-0"
-                style={{ color: 'rgba(200,214,229,0.45)' }}>{num}</span>
+              {/* Value + pct */}
+              <span className="font-mono text-[9px] font-bold w-10 text-right flex-shrink-0"
+                style={{ color: 'rgba(200,214,229,0.45)' }}>{num} <span style={{ color: 'rgba(200,214,229,0.25)', fontSize: '7px' }}>{pct}%</span></span>
             </div>
           )
         })}

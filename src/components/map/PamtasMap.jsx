@@ -126,38 +126,44 @@ export function PamtasMap({
         )}
       </MapContainer>
 
-      {/* Layer toggle controls */}
-      <MapLayerControls />
+      {/* Layer toggle controls — di dalam div relative tapi z-index tinggi */}
+      <div className="absolute bottom-4 left-2 z-[1000] pointer-events-auto">
+        <MapLayerControls />
+      </div>
     </div>
   )
 }
 
 /**
- * Kontrol tile layer di pojok kiri bawah peta (HUD style)
+ * Kontrol tile layer — bisa dipakai standalone maupun di dalam PamtasMap
  */
-function MapLayerControls() {
+export function MapLayerControls() {
   const { mapLayer, setMapLayer } = useApp()
 
   return (
-    <div className="absolute bottom-16 left-2 z-[1000] flex flex-col gap-1">
-      {['street', 'satellite'].map(layer => (
+    <div className="flex flex-col gap-1">
+      {[
+        { key: 'street',    label: '◫ PETA' },
+        { key: 'satellite', label: '◉ SATELIT' },
+      ].map(({ key, label }) => (
         <button
-          key={layer}
-          onClick={() => setMapLayer(layer)}
-          className="px-2 py-1 text-[9px] font-bold tracking-widest uppercase rounded-sm transition-all"
-          style={mapLayer === layer ? {
+          key={key}
+          onClick={(e) => { e.stopPropagation(); setMapLayer(key) }}
+          className="px-3 py-1.5 text-[9px] font-bold tracking-widest uppercase rounded-sm transition-all"
+          style={mapLayer === key ? {
             background: 'rgba(0,255,136,0.15)',
             border: '1px solid rgba(0,255,136,0.5)',
             color: '#00ff88',
             backdropFilter: 'blur(8px)',
+            boxShadow: '0 0 8px rgba(0,255,136,0.2)',
           } : {
-            background: 'rgba(5,8,10,0.8)',
+            background: 'rgba(5,8,10,0.85)',
             border: '1px solid rgba(0,255,136,0.15)',
-            color: 'rgba(200,214,229,0.4)',
+            color: 'rgba(200,214,229,0.45)',
             backdropFilter: 'blur(8px)',
           }}
         >
-          {layer === 'street' ? '◫ PETA' : '◉ SATELIT'}
+          {label}
         </button>
       ))}
     </div>
