@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import {
@@ -52,9 +52,9 @@ export default function PosDetailPage() {
   const activeKerawanan = (kerawananList || []).filter(k => k.status === 'aktif').length
 
   // Sync ke map saat halaman dibuka
-  useState(() => {
+  useEffect(() => {
     setSelectedPosId && setSelectedPosId(posId)
-  })
+  }, [posId, setSelectedPosId])
 
   return (
     <div className="flex flex-col h-full fade-in">

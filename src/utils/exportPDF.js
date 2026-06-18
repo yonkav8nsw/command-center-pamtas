@@ -12,10 +12,13 @@ export function exportToPDF(title = 'Command Center Pamtas') {
 /**
  * Export data ke CSV
  */
-export function exportToCSV(data, filename = 'data-pamtas.csv') {
+export function exportToCSV(data, columns, filename = 'data-pamtas.csv') {
   if (!data || data.length === 0) return
 
-  const headers = Object.keys(data[0])
+  // Jika columns diberikan, pakai itu sebagai header. Kalau tidak, pakai semua key.
+  const headers = Array.isArray(columns) && columns.length > 0
+    ? columns
+    : Object.keys(data[0])
   const rows = data.map(row =>
     headers.map(h => {
       const val = row[h] ?? ''

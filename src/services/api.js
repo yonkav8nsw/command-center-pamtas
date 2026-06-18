@@ -99,8 +99,10 @@ export const api = {
   deleteTokoh:     (data) => gasPost('deleteTokoh', data),
   addBinter:       (data) => gasPost('addBinter', data),
   updateBinter:    (data) => gasPost('updateBinter', data),
+  deleteBinter:    (data) => gasPost('deleteBinter', data),
   addKerawanan:    (data) => gasPost('addKerawanan', data),
   updateKerawanan: (data) => gasPost('updateKerawanan', data),
+  deleteKerawanan: (data) => gasPost('deleteKerawanan', data),
   updateDemografi: (data) => gasPost('updateDemografi', data),
   updatePos:       (data) => gasPost('updatePos', data),
 }
@@ -114,7 +116,7 @@ function getDummyData(action, params) {
 
     case 'getSummary':
       return {
-        total_pos: 18,
+        total_pos: 17,
         total_penduduk: 0,
         total_kk: 0,
         kerawanan_aktif: 0,
@@ -124,34 +126,23 @@ function getDummyData(action, params) {
     case 'getDemografi':
       return {
         pos_id: params.pos_id,
-        total_penduduk: 1420,
-        total_kk: 355,
-        islam: 1100, kristen: 180, katolik: 90, hindu: 35, buddha: 10, konghucu: 0, lainnya: 5,
-        masjid: 4, gereja: 1, pura: 2, vihara: 0,
-        geografi: 'Wilayah pedesaan di Jawa Timur dengan topografi berbukit. Akses jalan aspal menuju kota kecamatan sekitar 15 km.',
-        demografi_notes: 'Mayoritas penduduk adalah Suku Jawa dan Madura. Mata pencaharian utama pertanian dan perkebunan.',
-        konsos_notes: 'Kondisi sosial kondusif. Hubungan antar warga harmonis. Tingkat pendidikan rata-rata SMA.',
+        total_penduduk: 0,
+        total_kk: 0,
+        islam: 0, kristen: 0, katolik: 0, hindu: 0, buddha: 0, konghucu: 0, lainnya: 0,
+        masjid: 0, gereja: 0, pura: 0, vihara: 0,
+        geografi: '—',
+        demografi_notes: '—',
+        konsos_notes: '—',
       }
 
     case 'getTokoh':
-      return [
-        { id: 'T001', pos_id: params.pos_id, nama: 'H. Slamet Riyadi', kategori: 'Adat', jabatan: 'Kepala Desa', alamat: 'Desa Setempat', no_telp: '081234567890', catatan: 'Tokoh berpengaruh, kooperatif' },
-        { id: 'T002', pos_id: params.pos_id, nama: 'KH. Mahmud Faiz', kategori: 'Agama', jabatan: 'Ketua MUI Kecamatan', alamat: 'Pesantren Al-Hidayah', no_telp: '082345678901', catatan: '' },
-        { id: 'T003', pos_id: params.pos_id, nama: 'Camat Setempat', kategori: 'Masyarakat', jabatan: 'Camat', alamat: 'Kantor Kecamatan', no_telp: '083456789012', catatan: 'Aktif koordinasi dengan Satgas' },
-      ]
+      return []
 
     case 'getBinter':
-      return [
-        { id: 'B001', pos_id: params.pos_id, tanggal: '2026-06-10', jenis_kegiatan: 'Pengobatan Gratis', lokasi: 'Balai Desa', sasaran: 'Warga Desa', jumlah_peserta: 110, keterangan: 'Bekerjasama dengan Puskesmas setempat', foto_url: '' },
-        { id: 'B002', pos_id: params.pos_id, tanggal: '2026-06-05', jenis_kegiatan: 'Olahraga Bersama', lokasi: 'Lapangan Desa', sasaran: 'Pemuda Desa', jumlah_peserta: 50, keterangan: 'Turnamen voli dan futsal', foto_url: '' },
-        { id: 'B003', pos_id: params.pos_id, tanggal: '2026-05-28', jenis_kegiatan: 'Penyuluhan Hukum', lokasi: 'Balai Desa', sasaran: 'Tokoh Masyarakat', jumlah_peserta: 30, keterangan: 'Sosialisasi ketertiban dan keamanan wilayah', foto_url: '' },
-      ]
+      return []
 
     case 'getKerawanan':
-      return [
-        { id: 'K001', pos_id: params.pos_id, tanggal: '2026-06-12', kategori: 'Kriminal', deskripsi: 'Laporan pencurian kendaraan di wilayah desa', status: 'aktif', lat: -8.290, lng: 112.730, pelaku: 'Tidak diketahui', tindak_lanjut: 'Koordinasi dengan Polsek setempat', foto_url: '' },
-        { id: 'K002', pos_id: params.pos_id, tanggal: '2026-06-01', kategori: 'Sosial', deskripsi: 'Potensi konflik lahan antar warga desa', status: 'selesai', lat: -8.295, lng: 112.735, pelaku: 'Warga setempat', tindak_lanjut: 'Mediasi berhasil dilakukan', foto_url: '' },
-      ]
+      return []
 
     case 'getAllKerawanan':
       return DUMMY_KERAWANAN

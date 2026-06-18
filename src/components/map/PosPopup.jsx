@@ -1,5 +1,4 @@
 import { formatDate } from '../../utils/formatDate'
-import { KerawananBadge } from '../ui/Badge'
 
 /**
  * Popup marker Pos — desain bersih, teks jelas
@@ -156,36 +155,64 @@ function DataRow({ label, value, valueColor, valueBold, valueLarge, mono }) {
 }
 
 /**
- * Popup konten untuk marker Kerawanan
+ * Popup marker Kerawanan — inline styles, no Tailwind dependencies
  */
 export function KerawananPopup({ item }) {
+  const isAktif = item.status === 'aktif'
   return (
-    <div className="min-w-[180px]">
-      <div className="flex items-center gap-2 mb-2">
-        <div className="w-2 h-2 rounded-full bg-military-danger flex-shrink-0" />
-        <KerawananBadge kategori={item.kategori} />
+    <div style={{ minWidth: '180px', fontFamily: 'sans-serif' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+        <div style={{
+          width: '8px', height: '8px', borderRadius: '50%',
+          background: isAktif ? '#ff3333' : '#00ff88',
+          flexShrink: 0,
+        }} />
+        <span style={{
+          fontSize: '10px', fontWeight: '700', letterSpacing: '0.1em',
+          textTransform: 'uppercase',
+          color: isAktif ? '#ff5555' : '#00ff88',
+        }}>
+          {item.kategori || 'Kerawanan'}
+        </span>
       </div>
 
-      <p className="text-military-text text-xs mb-2 leading-relaxed">{item.deskripsi}</p>
+      {item.deskripsi && (
+        <p style={{
+          fontSize: '11px', color: 'rgba(200,214,229,0.75)',
+          marginBottom: '8px', lineHeight: 1.5, margin: '0 0 8px 0',
+        }}>
+          {item.deskripsi}
+        </p>
+      )}
 
-      <div className="space-y-1 text-xs border-t border-military-border pt-2">
-        <div className="flex justify-between">
-          <span className="text-military-subtext">Tanggal</span>
-          <span className="text-military-text">{formatDate(item.tanggal)}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-military-subtext">Status</span>
-          <span className={item.status === 'aktif' ? 'text-red-400' : 'text-green-400'}>
-            {item.status === 'aktif' ? '● Aktif' : '✓ Selesai'}
-          </span>
-        </div>
+      <div style={{
+        borderTop: '1px solid rgba(0,255,136,0.12)',
+        paddingTop: '8px',
+        display: 'flex', flexDirection: 'column', gap: '4px',
+      }}>
+        {item.tanggal && (
+          <KPopupRow label="Tanggal" value={formatDate(item.tanggal)} />
+        )}
+        <KPopupRow
+          label="Status"
+          value={isAktif ? '● Aktif' : '✓ Selesai'}
+          valueColor={isAktif ? '#ff5555' : '#00ff88'}
+        />
         {item.pos_id && (
-          <div className="flex justify-between">
-            <span className="text-military-subtext">Pos</span>
-            <span className="text-military-text">{item.pos_id}</span>
-          </div>
+          <KPopupRow label="Pos" value={item.pos_id} />
         )}
       </div>
+    </div>
+  )
+}
+
+function KPopupRow({ label, value, valueColor }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+      <span style={{ fontSize: '10px', color: 'rgba(200,214,229,0.4)' }}>{label}</span>
+      <span style={{ fontSize: '10px', color: valueColor || 'rgba(200,214,229,0.75)', fontWeight: '500' }}>
+        {value}
+      </span>
     </div>
   )
 }

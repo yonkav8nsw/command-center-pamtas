@@ -2,8 +2,8 @@
 // Wilayah: Kab. Nunukan, Kalimantan Utara
 
 export const MAP_CONFIG = {
-  center: [-8.295, 112.700],
-  zoom: 12,
+  center: [4.0, 116.8],
+  zoom: 9,
   minZoom: 6,
   maxZoom: 17,
   // Dark tile — CartoDB Dark Matter
