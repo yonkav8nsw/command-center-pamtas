@@ -15,7 +15,7 @@ export default function PanduanPage() {
   const [activeTab, setActiveTab] = useState('overview')
 
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="absolute inset-0 overflow-y-auto">
     <div className="p-4 space-y-4 fade-in max-w-4xl">
 
       {/* Header */}
