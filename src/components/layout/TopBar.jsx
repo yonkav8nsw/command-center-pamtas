@@ -37,11 +37,31 @@ export function TopBar() {
           </svg>
         </button>
 
-        {/* Badge icon */}
-        <div className="w-7 h-7 flex-shrink-0 flex items-center justify-center rounded-sm border border-[rgba(0,255,136,0.2)] bg-[rgba(0,0,0,0.4)]">
-          <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="#00ff88">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-          </svg>
+        {/* Badge icon — Logo Satgas dengan efek glitch */}
+        <div className="w-7 h-7 flex-shrink-0 relative flex items-center justify-center logo-glitch-wrap">
+          {/* Layer cyan — geser kiri */}
+          <img
+            src={`${import.meta.env.BASE_URL}logo-satgas.png`}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-contain logo-glitch-cyan"
+          />
+          {/* Layer magenta — geser kanan */}
+          <img
+            src={`${import.meta.env.BASE_URL}logo-satgas.png`}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-contain logo-glitch-magenta"
+          />
+          {/* Layer utama */}
+          <img
+            src={`${import.meta.env.BASE_URL}logo-satgas.png`}
+            alt="Logo Satgas"
+            className="w-full h-full object-contain relative logo-glitch-main"
+            style={{ zIndex: 1 }}
+          />
+          {/* Scanline overlay */}
+          <div className="absolute inset-0 logo-glitch-scanline" style={{ zIndex: 2, pointerEvents: 'none' }} />
         </div>
 
         {/* Clock + Date — container auto-sizes to clock text width */}
@@ -71,13 +91,6 @@ export function TopBar() {
 
       {/* ── RIGHT: actions ────────────────────────────────── */}
       <div className="topbar-nav flex items-center gap-1 flex-shrink-0">
-
-        {/* Telemetry pills */}
-        <div className="hidden lg:flex items-center gap-2 mr-2">
-          <TelePill label="SYS" value="ONLINE" color="green" />
-          <TelePill label="SYNC" value="AUTO" color="blue" />
-          <TelePill label="LAST" value="--:--" color="amber" />
-        </div>
 
         {/* Presentasi */}
         <HudIconBtn
