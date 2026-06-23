@@ -1,7 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Component } from 'react'
 import { AppProvider } from './context/AppContext'
+import { AuthProvider } from './context/AuthContext'
+import { ToastProvider } from './components/ui/Toast'
+import { ConfirmProvider } from './components/ui/ConfirmDialog'
+import PageErrorBoundary from './components/ui/PageErrorBoundary'
+import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { AppShell } from './components/layout/AppShell'
+import LoginPage            from './pages/LoginPage'
 import OverviewPage         from './pages/OverviewPage'
 import PosDetailPage        from './pages/PosDetailPage'
 import KerawananPage        from './pages/KerawananPage'
@@ -13,7 +19,8 @@ import TimelineBinterPage   from './pages/laporan/TimelineBinterPage'
 import DataDemografiPage    from './pages/laporan/DataDemografiPage'
 import TokohWilayahPage     from './pages/laporan/TokohWilayahPage'
 
-class ErrorBoundary extends Component {
+// Error boundary global — menangkap crash di luar routing
+class GlobalErrorBoundary extends Component {
   constructor(props) {
     super(props)
     this.state = { hasError: false, error: null }
@@ -70,29 +77,50 @@ class ErrorBoundary extends Component {
   }
 }
 
+// Helper: wrap element dengan PageErrorBoundary per route
+function Safe({ children }) {
+  return <PageErrorBoundary>{children}</PageErrorBoundary>
+}
+
 export default function App() {
   return (
-    <ErrorBoundary>
-      <AppProvider>
-        <BrowserRouter basename={import.meta.env.BASE_URL}>
-          <AppShell>
-            <Routes>
-              <Route path="/"                       element={<OverviewPage />} />
-              <Route path="/pos/:posId"              element={<PosDetailPage />} />
-              <Route path="/pos/:posId/:tab"         element={<PosDetailPage />} />
-              <Route path="/kerawanan"               element={<KerawananPage />} />
-              <Route path="/binter"                  element={<BinterPage />} />
-              <Route path="/admin"                   element={<AdminPage />} />
-              <Route path="/panduan"                 element={<PanduanPage />} />
-              <Route path="/laporan/kerawanan"       element={<GrafikKerawananPage />} />
-              <Route path="/laporan/binter"          element={<TimelineBinterPage />} />
-              <Route path="/laporan/demografi"       element={<DataDemografiPage />} />
-              <Route path="/laporan/tokoh"           element={<TokohWilayahPage />} />
-              <Route path="*"                        element={<Navigate to="/" replace />} />
-            </Routes>
-          </AppShell>
-        </BrowserRouter>
-      </AppProvider>
-    </ErrorBoundary>
+    <GlobalErrorBoundary>
+      <ToastProvider>
+        <ConfirmProvider>
+          <AuthProvider>
+            <AppProvider>
+              <BrowserRouter basename={import.meta.env.BASE_URL}>
+                <Routes>
+                  {/* Halaman login — tidak perlu auth */}
+                  <Route path="/login" element={<LoginPage />} />
+
+                  {/* Semua route lain butuh login */}
+                  <Route path="/*" element={
+                    <ProtectedRoute>
+                      <AppShell>
+                        <Routes>
+                          <Route path="/"                       element={<Safe><OverviewPage /></Safe>} />
+                          <Route path="/pos/:posId"              element={<Safe><PosDetailPage /></Safe>} />
+                          <Route path="/pos/:posId/:tab"         element={<Safe><PosDetailPage /></Safe>} />
+                          <Route path="/kerawanan"               element={<Safe><KerawananPage /></Safe>} />
+                          <Route path="/binter"                  element={<Safe><BinterPage /></Safe>} />
+                          <Route path="/admin"                   element={<Safe><AdminPage requireAdmin /></Safe>} />
+                          <Route path="/panduan"                 element={<Safe><PanduanPage /></Safe>} />
+                          <Route path="/laporan/kerawanan"       element={<Safe><GrafikKerawananPage /></Safe>} />
+                          <Route path="/laporan/binter"          element={<Safe><TimelineBinterPage /></Safe>} />
+                          <Route path="/laporan/demografi"       element={<Safe><DataDemografiPage /></Safe>} />
+                          <Route path="/laporan/tokoh"           element={<Safe><TokohWilayahPage /></Safe>} />
+                          <Route path="*"                        element={<Navigate to="/" replace />} />
+                        </Routes>
+                      </AppShell>
+                    </ProtectedRoute>
+                  } />
+                </Routes>
+              </BrowserRouter>
+            </AppProvider>
+          </AuthProvider>
+        </ConfirmProvider>
+      </ToastProvider>
+    </GlobalErrorBoundary>
   )
 }

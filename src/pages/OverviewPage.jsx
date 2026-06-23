@@ -1,17 +1,17 @@
 import { useNavigate } from 'react-router-dom'
 import { PamtasMap } from '../components/map/PamtasMap'
 import { KerawananBadge } from '../components/ui/Badge'
-import { usePos, useSummary, useAllKerawanan, useAllBinter, useAutoRefresh } from '../hooks/useGasApi'
+import { usePos, useSummary, useAllKerawanan, useAllBinter, useAutoRefresh } from '../hooks/useSupabase'
 import { formatDate } from '../utils/formatDate'
 import { useApp } from '../context/AppContext'
+import { BINTER_COLOR_MAP } from '../constants/kerawananCategories'
 
-const JENIS_COLOR = {
-  'Penyuluhan':  '#00ff88',
-  'Baksos':      '#4488ff',
-  'Olahraga':    '#ffaa00',
-  'Kunjungan':   '#bb88ff',
-  'Patroli':     '#ff8844',
-  'Koordinasi':  '#00ccff',
+function getBinterColor(jenis) {
+  if (!jenis) return '#4488ff'
+  for (const [key, val] of Object.entries(BINTER_COLOR_MAP)) {
+    if (jenis.toLowerCase().includes(key.toLowerCase())) return val
+  }
+  return '#4488ff'
 }
 
 export default function OverviewPage() {
@@ -25,13 +25,30 @@ export default function OverviewPage() {
   // Auto-refresh setiap 5 menit
   useAutoRefresh([refetchPos, refetchSummary, refetchKerawanan, refetchBinter])
 
-  const activeKerawanan = (kerawanan || []).filter(k => k.status === 'aktif')
+  const activeKerawanan = (kerawanan || []).filter(k => k.status?.toLowerCase() === 'aktif')
   const recentBinter    = (binter || [])
     .sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal))
     .slice(0, 5)
 
+  // Lookup pos_id → nama_pos dari posList GAS
+  const posNameMap = (posList || []).reduce((acc, p) => {
+    acc[p.pos_id] = p.nama_pos || p.pos_id
+    return acc
+  }, {})
+
+  // Ambil 1 ancaman per pos (pos berbeda), max 6
+  const ancamanPerPos = []
+  const seenPos = new Set()
+  for (const item of activeKerawanan) {
+    if (!seenPos.has(item.pos_id)) {
+      seenPos.add(item.pos_id)
+      ancamanPerPos.push(item)
+    }
+    if (ancamanPerPos.length >= 6) break
+  }
+
   const posRawan     = [...new Set(activeKerawanan.map(k => k.pos_id))].length
-  const totalPos     = (posList || []).length || 18
+  const totalPos     = (posList || []).length || 17
   const posAman      = totalPos - posRawan
   // Hitung total personel dari posList (field jumlah_personel sudah dinormalisasi dari kuat_pers)
   const totalPersonel = (posList || []).reduce((s, p) => s + (Number(p.jumlah_personel) || 0), 0)
@@ -129,7 +146,7 @@ export default function OverviewPage() {
                 </span>
               </div>
             ) : (
-              activeKerawanan.slice(0, 6).map(item => (
+              ancamanPerPos.map(item => (
                 <div key={item.id}
                   className="flex items-start gap-2 p-2 cursor-pointer transition-all rounded-sm"
                   style={{ background: 'rgba(255,51,51,0.06)', border: '1px solid rgba(255,51,51,0.2)' }}
@@ -138,12 +155,17 @@ export default function OverviewPage() {
                   <div className="w-1.5 h-1.5 rounded-full bg-[#ff3333] mt-1.5 flex-shrink-0 animate-pulse"
                     style={{ boxShadow: '0 0 5px rgba(255,51,51,0.9)' }} />
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1 mb-0.5">
+                    <div className="flex items-center justify-between gap-1 mb-0.5">
                       <KerawananBadge kategori={item.kategori} />
+                      <span className="text-[8px] font-bold tracking-wide flex-shrink-0"
+                        style={{ color: 'rgba(255,100,100,0.75)' }}>
+                        {posNameMap[item.pos_id]
+                          ? posNameMap[item.pos_id].replace(/^Pos /i, 'POS ').toUpperCase()
+                          : item.pos_id}
+                      </span>
                     </div>
-                    <p className="text-[9px] text-[rgba(200,214,229,0.5)] truncate">
-                      <span className="text-[rgba(255,100,100,0.7)]">{item.pos_id}</span>
-                      {item.deskripsi ? ` · ${item.deskripsi.slice(0, 30)}` : ''}
+                    <p className="text-[9px] text-[rgba(200,214,229,0.45)] truncate">
+                      {item.deskripsi ? item.deskripsi.slice(0, 35) : '—'}
                     </p>
                   </div>
                 </div>
@@ -170,8 +192,8 @@ export default function OverviewPage() {
                 <div key={item.id || i} className="flex items-start gap-2">
                   <div className="w-1 h-1 rounded-full mt-1.5 flex-shrink-0"
                     style={{
-                      background: JENIS_COLOR[item.jenis_kegiatan] || '#4488ff',
-                      boxShadow: `0 0 4px ${JENIS_COLOR[item.jenis_kegiatan] || '#4488ff'}`,
+                      background: getBinterColor(item.jenis_kegiatan),
+                      boxShadow: `0 0 4px ${getBinterColor(item.jenis_kegiatan)}`,
                     }} />
                   <div className="min-w-0">
                     <p className="text-[10px] font-medium text-[rgba(200,214,229,0.8)] truncate leading-tight">
@@ -437,13 +459,15 @@ function MapLayerBar() {
   const { mapLayers, toggleMapLayer } = useApp()
 
   const layers = [
-    { key: 'pos',         label: 'Pos',        color: '#00ff88' },
-    { key: 'kerawanan',   label: 'Kerawanan',  color: '#ff3333' },
-    { key: 'kriminal',    label: 'Kriminal',   color: '#ff5555' },
-    { key: 'logging',     label: 'Logging',    color: '#ff8844' },
-    { key: 'mining',      label: 'Mining',     color: '#bb88ff' },
-    { key: 'trafficking', label: 'Trafficking',color: '#ff44aa' },
-    { key: 'binter',      label: 'Binter',     color: '#4488ff' },
+    { key: 'pos',         label: 'Pos',         color: '#00ff88' },
+    { key: 'narkoba',     label: 'Narkoba',     color: '#dc2626' },
+    { key: 'kriminal',    label: 'Kriminal',    color: '#ef4444' },
+    { key: 'logging',     label: 'Logging',     color: '#d97706' },
+    { key: 'trading',     label: 'Trading',     color: '#f59e0b' },
+    { key: 'trafficking', label: 'Trafficking', color: '#db2777' },
+    { key: 'border',      label: 'Border',      color: '#0ea5e9' },
+    { key: 'pmInp',       label: 'PMI NP',      color: '#ea580c' },
+    { key: 'binter',      label: 'Binter',      color: '#4488ff' },
   ]
 
   return (
@@ -459,7 +483,7 @@ function MapLayerBar() {
           <button
             key={key}
             onClick={() => toggleMapLayer(key)}
-            className="flex items-center gap-1 px-1.5 py-0.5 rounded-sm transition-all"
+            className="flex items-center gap-1 px-1.5 py-0.5 rounded-sm transition-all whitespace-nowrap"
             style={{
               background: active ? `${color}18` : 'transparent',
               border: `1px solid ${active ? color + '44' : 'rgba(255,255,255,0.06)'}`,

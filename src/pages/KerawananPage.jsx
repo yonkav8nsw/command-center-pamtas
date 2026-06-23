@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAllKerawanan, usePos } from '../hooks/useGasApi'
+import { useAllKerawanan, usePos } from '../hooks/useSupabase'
 import { KERAWANAN_CATEGORIES } from '../constants/kerawananCategories'
 import { KerawananBadge } from '../components/ui/Badge'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
@@ -18,19 +18,27 @@ export default function KerawananPage() {
   const [search,         setSearch]         = useState('')
 
   const filtered = (kerawanan || []).filter(k => {
-    if (filterStatus !== 'all' && k.status !== filterStatus) return false
+    if (filterStatus !== 'all' && k.status?.toLowerCase() !== filterStatus) return false
     if (filterKategori !== 'all' && k.kategori !== filterKategori) return false
     if (filterPos !== 'all' && k.pos_id !== filterPos) return false
     if (search && !k.deskripsi?.toLowerCase().includes(search.toLowerCase()) &&
         !k.pos_id?.toLowerCase().includes(search.toLowerCase())) return false
     return true
   }).sort((a, b) => {
-    if (a.status === 'aktif' && b.status !== 'aktif') return -1
-    if (a.status !== 'aktif' && b.status === 'aktif') return 1
+    const aAktif = a.status?.toLowerCase() === 'aktif'
+    const bAktif = b.status?.toLowerCase() === 'aktif'
+    if (aAktif && !bAktif) return -1
+    if (!aAktif && bAktif) return 1
     return new Date(b.tanggal) - new Date(a.tanggal)
   })
 
-  const aktifCount = (kerawanan || []).filter(k => k.status === 'aktif').length
+  const aktifCount = (kerawanan || []).filter(k => k.status?.toLowerCase() === 'aktif').length
+
+  // Lookup pos_id → nama_pos
+  const posMap = (posList || []).reduce((acc, p) => {
+    acc[p.pos_id] = p.nama_pos || p.pos_id
+    return acc
+  }, {})
 
   return (
     <div className="flex flex-col h-full fade-in">
@@ -101,7 +109,7 @@ export default function KerawananPage() {
             {filtered.map((item, i) => {
               const cat = KERAWANAN_CATEGORIES.find(c => c.id === item.kategori)
               const color = cat?.color || '#888'
-              const isAktif = item.status === 'aktif'
+              const isAktif = item.status?.toLowerCase() === 'aktif'
               return (
                 <div
                   key={item.id || i}
@@ -120,7 +128,7 @@ export default function KerawananPage() {
                         {item.status}
                       </span>
                       <KerawananBadge kategori={item.kategori} />
-                      <span className="text-[rgba(0,255,136,0.6)] text-[10px] font-mono font-bold">{item.pos_id}</span>
+                      <span className="text-[rgba(0,255,136,0.6)] text-[10px] font-mono font-bold">{posMap[item.pos_id] || item.pos_id}</span>
                       <span className="text-[rgba(200,214,229,0.3)] text-[10px] font-mono">{formatDate(item.tanggal)}</span>
                     </div>
                     <p className="text-[rgba(200,214,229,0.6)] text-xs truncate">{item.deskripsi}</p>

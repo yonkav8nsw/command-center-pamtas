@@ -1,4 +1,4 @@
-import { useAllBinter } from '../../hooks/useGasApi'
+import { useAllBinter } from '../../hooks/useSupabase'
 import { formatDate } from '../../utils/formatDate'
 
 const JENIS_COLOR = {

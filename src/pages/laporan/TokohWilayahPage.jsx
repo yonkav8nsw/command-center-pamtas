@@ -1,5 +1,18 @@
 import { useState } from 'react'
-import { usePos } from '../../hooks/useGasApi'
+import { usePos, useAllTokoh } from '../../hooks/useSupabase'
+
+// Normalisasi kategori dari sheet (TOMAS/TODAT/TOGA) ke display label
+const KATEGORI_NORMALIZE = {
+  'TOMAS': 'Masyarakat', 'tomas': 'Masyarakat',
+  'TODAT': 'Adat',       'todat': 'Adat',
+  'TOGA':  'Agama',      'toga':  'Agama',
+  'Adat':       'Adat',
+  'Masyarakat': 'Masyarakat',
+  'Agama':      'Agama',
+}
+function normalizeKategori(raw) {
+  return KATEGORI_NORMALIZE[raw] || KATEGORI_NORMALIZE[raw?.trim()] || raw || 'Lainnya'
+}
 
 const KATEGORI_COLOR = {
   'Adat':        '#ffaa00',
@@ -9,32 +22,36 @@ const KATEGORI_COLOR = {
   'Lainnya':     '#8899aa',
 }
 
-const MOCK_TOKOH = [
-  { id: 1, pos_id: 'POS-01', nama: 'Bpk. Yohanes K.', kategori: 'Adat',       jabatan: 'Kepala Adat', catatan: 'Tokoh berpengaruh wilayah perbatasan' },
-  { id: 2, pos_id: 'POS-01', nama: 'Bpk. Ahmad S.',   kategori: 'Masyarakat', jabatan: 'Kepala Desa', catatan: 'Koordinasi rutin dengan Pos' },
-  { id: 3, pos_id: 'POS-02', nama: 'Bpk. Markus T.',  kategori: 'Agama',      jabatan: 'Pendeta',     catatan: 'Aktif dalam kegiatan sosial' },
-  { id: 4, pos_id: 'POS-03', nama: 'Ibu Sari W.',     kategori: 'Masyarakat', jabatan: 'Ketua PKK',   catatan: 'Berperan aktif kegiatan Baksos' },
-  { id: 5, pos_id: 'POS-04', nama: 'Bpk. Rizal H.',   kategori: 'Pemuda',     jabatan: 'Ketua Karang Taruna', catatan: 'Fasilitator kegiatan olahraga' },
-]
-
 export default function TokohWilayahPage() {
-  const { data: posList, loading } = usePos()
-  const [filterPos, setFilterPos]         = useState('semua')
-  const [filterKategori, setFilterKategori] = useState('semua')
-  const [search, setSearch]               = useState('')
+  const { data: posList, loading: posLoading } = usePos()
+  const { data: tokohData, loading: tokohLoading } = useAllTokoh()
+  const [filterPos,      setFilterPos]      = useState('all')
+  const [filterKategori, setFilterKategori] = useState('all')
+  const [search,         setSearch]         = useState('')
 
-  const all = posList || []
+  const loading = posLoading || tokohLoading
+  // Normalisasi kategori dari sheet
+  const allTokoh = (tokohData || []).map(t => ({
+    ...t,
+    _kategori: normalizeKategori(t.kategori),
+  }))
 
-  const tokoh = MOCK_TOKOH.filter(t => {
-    if (filterPos !== 'semua' && t.pos_id !== filterPos) return false
-    if (filterKategori !== 'semua' && t.kategori !== filterKategori) return false
-    if (search && !t.nama.toLowerCase().includes(search.toLowerCase()) &&
-        !t.jabatan.toLowerCase().includes(search.toLowerCase())) return false
+  const posNameMap = (posList || []).reduce((acc, p) => {
+    acc[p.pos_id] = p.nama_pos || p.pos_id
+    return acc
+  }, {})
+
+  const tokoh = allTokoh.filter(t => {
+    if (filterPos !== 'all' && t.pos_id !== filterPos) return false
+    if (filterKategori !== 'all' && t._kategori !== filterKategori) return false
+    if (search && !t.nama?.toLowerCase().includes(search.toLowerCase()) &&
+        !t.jabatan?.toLowerCase().includes(search.toLowerCase())) return false
     return true
   })
 
-  const byKategori = MOCK_TOKOH.reduce((acc, t) => {
-    acc[t.kategori] = (acc[t.kategori] || 0) + 1
+  const byKategori = allTokoh.reduce((acc, t) => {
+    const k = t._kategori || 'Lainnya'
+    acc[k] = (acc[k] || 0) + 1
     return acc
   }, {})
 
@@ -55,7 +72,7 @@ export default function TokohWilayahPage() {
 
         {/* Summary + distribusi */}
         <div className="grid grid-cols-4 gap-3">
-          <StatCard label="Total Tokoh" value={MOCK_TOKOH.length} color="#bb88ff" icon="◉" />
+          <StatCard label="Total Tokoh" value={allTokoh.length} color="#bb88ff" icon="◉" />
           {Object.entries(byKategori).map(([kat, count]) => (
             <StatCard key={kat} label={kat} value={count} color={KATEGORI_COLOR[kat] || '#8899aa'} icon="◆" />
           ))}
@@ -88,8 +105,8 @@ export default function TokohWilayahPage() {
             style={{ background: 'rgba(5,8,10,0.8)', border: '1px solid rgba(0,255,136,0.15)',
                      color: 'rgba(200,214,229,0.6)' }}
           >
-            <option value="semua">Semua Pos</option>
-            {all.map(p => (
+            <option value="all">Semua Pos</option>
+            {(posList || []).map(p => (
               <option key={p.pos_id} value={p.pos_id}>{p.pos_id}</option>
             ))}
           </select>
@@ -102,7 +119,7 @@ export default function TokohWilayahPage() {
             style={{ background: 'rgba(5,8,10,0.8)', border: '1px solid rgba(0,255,136,0.15)',
                      color: 'rgba(200,214,229,0.6)' }}
           >
-            <option value="semua">Semua Kategori</option>
+            <option value="all">Semua Kategori</option>
             {Object.keys(KATEGORI_COLOR).map(k => (
               <option key={k} value={k}>{k}</option>
             ))}
@@ -124,10 +141,10 @@ export default function TokohWilayahPage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3">
-            {tokoh.map(t => {
-              const color = KATEGORI_COLOR[t.kategori] || '#8899aa'
+            {tokoh.map((t, i) => {
+              const color = KATEGORI_COLOR[t._kategori] || '#8899aa'
               return (
-                <div key={t.id} className="rounded-sm overflow-hidden transition-all"
+                <div key={t.id || `${t.pos_id}-${t.nama}-${i}`} className="rounded-sm overflow-hidden transition-all"
                   style={{ background: 'rgba(5,8,10,0.8)', border: `1px solid ${color}22` }}
                   onMouseEnter={e => e.currentTarget.style.borderColor = `${color}44`}
                   onMouseLeave={e => e.currentTarget.style.borderColor = `${color}22`}
@@ -148,7 +165,7 @@ export default function TokohWilayahPage() {
                           style={{ color: 'rgba(200,214,229,0.85)' }}>{t.nama}</p>
                         <span className="text-[8px] px-1.5 py-0.5 rounded-sm font-bold flex-shrink-0"
                           style={{ color, background: `${color}15`, border: `1px solid ${color}33` }}>
-                          {t.kategori}
+                          {t._kategori}
                         </span>
                       </div>
                       <p className="text-[9px] mt-0.5" style={{ color: 'rgba(200,214,229,0.45)' }}>
@@ -158,7 +175,9 @@ export default function TokohWilayahPage() {
                         <span className="font-mono text-[8px] px-1 py-0.5 rounded-sm"
                           style={{ color: 'rgba(0,255,136,0.55)', background: 'rgba(0,255,136,0.06)',
                                    border: '1px solid rgba(0,255,136,0.15)' }}>
-                          {t.pos_id}
+                          {posNameMap[t.pos_id]
+                            ? posNameMap[t.pos_id].replace(/^Pos /i, 'POS ').toUpperCase()
+                            : t.pos_id}
                         </span>
                         {t.catatan && (
                           <p className="text-[8px] truncate" style={{ color: 'rgba(200,214,229,0.3)' }}>

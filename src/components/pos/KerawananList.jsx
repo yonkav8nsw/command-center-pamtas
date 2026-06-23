@@ -4,8 +4,10 @@ import { EmptyState } from '../ui/EmptyState'
 import { Modal } from '../ui/Modal'
 import { KerawananForm } from '../forms/KerawananForm'
 import { formatDate } from '../../utils/formatDate'
-import { api } from '../../services/api'
-import { clearCache } from '../../hooks/useGasApi'
+import { useToast } from '../ui/Toast'
+import { useConfirm } from '../ui/ConfirmDialog'
+import { kerawananService } from '../../services/kerawanan.service'
+import { clearCache } from '../../hooks/useSupabase'
 import { KERAWANAN_CATEGORIES } from '../../constants/kerawananCategories'
 
 function getCatColor(kategori) {
@@ -19,44 +21,53 @@ function getCatLabel(kategori) {
 }
 
 export function KerawananList({ kerawananList, loading, posId, onRefresh }) {
+  const { showToast } = useToast()
+  const { confirm } = useConfirm()
   const [showForm, setShowForm] = useState(false)
   const [deleting, setDeleting] = useState(null)
   const [updatingId, setUpdatingId] = useState(null)
 
   const handleSave = async (data) => {
     try {
-      await api.addKerawanan({ ...data, pos_id: posId })
+      await kerawananService.add({ ...data, pos_id: posId })
       clearCache()
       onRefresh && onRefresh()
       setShowForm(false)
+      showToast('Laporan kerawanan berhasil disimpan', 'success')
     } catch (err) {
-      alert('Gagal menyimpan: ' + err.message)
+      showToast('Gagal menyimpan: ' + err.message, 'error')
     }
   }
 
   const handleToggleStatus = async (item) => {
-    const newStatus = item.status === 'aktif' ? 'selesai' : 'aktif'
+    const newStatus = item.status?.toLowerCase() === 'aktif' ? 'selesai' : 'aktif'
     setUpdatingId(item.id)
     try {
-      await api.updateKerawanan({ id: item.id, pos_id: posId, status: newStatus })
+      await kerawananService.update(item.id, { status: newStatus })
       clearCache()
       onRefresh && onRefresh()
+      showToast(`Status diubah ke "${newStatus}"`, 'success')
     } catch (err) {
-      alert('Gagal update: ' + err.message)
+      showToast('Gagal update: ' + err.message, 'error')
     } finally {
       setUpdatingId(null)
     }
   }
 
   const handleDelete = async (item) => {
-    if (!confirm(`Hapus laporan kerawanan ini?`)) return
+    const ok = await confirm('Hapus laporan kerawanan ini? Tindakan ini tidak dapat dibatalkan.', {
+      title: 'Hapus Laporan',
+      type: 'danger',
+    })
+    if (!ok) return
     setDeleting(item.id)
     try {
-      await api.deleteKerawanan({ id: item.id, pos_id: posId })
+      await kerawananService.remove(item.id)
       clearCache()
       onRefresh && onRefresh()
+      showToast('Laporan berhasil dihapus', 'success')
     } catch (err) {
-      alert('Gagal menghapus: ' + err.message)
+      showToast('Gagal menghapus: ' + err.message, 'error')
     } finally {
       setDeleting(null)
     }
@@ -65,12 +76,12 @@ export function KerawananList({ kerawananList, loading, posId, onRefresh }) {
   if (loading) return <LoadingSpinner text="Memuat data kerawanan..." />
 
   const sorted = [...(kerawananList || [])].sort((a, b) => {
-    if (a.status === 'aktif' && b.status !== 'aktif') return -1
-    if (a.status !== 'aktif' && b.status === 'aktif') return 1
+    if (a.status?.toLowerCase() === 'aktif' && b.status?.toLowerCase() !== 'aktif') return -1
+    if (a.status?.toLowerCase() !== 'aktif' && b.status?.toLowerCase() === 'aktif') return 1
     return new Date(b.tanggal) - new Date(a.tanggal)
   })
 
-  const aktif = sorted.filter(k => k.status === 'aktif').length
+  const aktif = sorted.filter(k => k.status?.toLowerCase() === 'aktif').length
 
   return (
     <div className="space-y-3 fade-in">
@@ -135,7 +146,7 @@ export function KerawananList({ kerawananList, loading, posId, onRefresh }) {
 
 function KerawananCard({ item, color, label, onToggleStatus, onDelete, updating, deleting }) {
   const [expanded, setExpanded] = useState(false)
-  const isAktif = item.status === 'aktif'
+  const isAktif = item.status?.toLowerCase() === 'aktif'
 
   return (
     <div
@@ -161,7 +172,7 @@ function KerawananCard({ item, color, label, onToggleStatus, onDelete, updating,
                 <span className="w-1 h-1 rounded-full bg-[#ff3333] animate-pulse inline-block"
                   style={{ boxShadow: '0 0 3px rgba(255,51,51,0.8)' }} />
               )}
-              {isAktif ? 'AKTIF' : 'SELESAI'}
+              {isAktif ? 'AKTIF' : 'DITANGANI'}
             </div>
             {/* Kategori */}
             <span

@@ -22,13 +22,26 @@ function MapController({ selectedPosId, posList }) {
 }
 
 // Kategori kerawanan → key mapLayers
+// Mencakup nama baru (7 kategori resmi) + alias nama lama dari Google Sheet
 const KATEGORI_TO_LAYER = {
-  'Kriminal':          'kriminal',
-  'Ilegal Logging':    'logging',
-  'Illegal Mining':    'mining',
-  'Human Trafficking': 'trafficking',
-  'Lintas Batas':      'kerawanan',
-  'Lainnya':           'kerawanan',
+  // ── Kategori resmi baru ──
+  'Narkoba':     'narkoba',
+  'Kriminal':    'kriminal',
+  'Logging':     'logging',
+  'Trading':     'trading',
+  'Trafficking': 'trafficking',
+  'Border':      'border',
+  'PMI NP':      'pmInp',
+
+  // ── Alias nama lama di sheet → kategori baru ──
+  'Human Trafficking':  'trafficking', // sinonim Trafficking
+  'Illegal Logging':    'logging',     // sinonim Logging
+  'Ilegal Logging':     'logging',     // typo umum
+  'Penyelundupan':      'trading',     // perdagangan lintas batas ilegal
+  'Imigran Gelap':      'pmInp',       // PMI non-prosedural
+  'Penjarahan Laut':    'kriminal',    // kejahatan oleh warga sekitar
+  'Ketergantungan':     'trading',     // dependensi sembako dari Malaysia
+  'Isolasi Wilayah':    'trading',     // akses sembako dari Malaysia saat terisolasi
 }
 
 /**
@@ -46,18 +59,36 @@ export function PamtasMap({
   // Filter pos yang punya koordinat valid
   const validPos = posList.filter(p => p.lat && p.lng && !isNaN(Number(p.lat)))
 
-  // Filter kerawanan berdasarkan mapLayers
-  const visibleKerawanan = kerawananList.filter(k => {
-    if (!k.lat || !k.lng || isNaN(Number(k.lat)) || isNaN(Number(k.lng))) return false
-    if (Number(k.lat) === 0 || Number(k.lng) === 0) return false
-    if (!showKerawanan) return false
-    // cek layer global kerawanan
-    if (!mapLayers.kerawanan) return false
-    // cek sub-layer berdasarkan kategori
-    const layerKey = KATEGORI_TO_LAYER[k.kategori] || 'kerawanan'
-    if (layerKey !== 'kerawanan' && !mapLayers[layerKey]) return false
-    return true
-  })
+  // Buat lookup pos_id → koordinat untuk fallback marker
+  const posCoordMap = posList.reduce((acc, p) => {
+    if (p.lat && p.lng && !isNaN(Number(p.lat)) && Number(p.lat) !== 0) {
+      acc[p.pos_id] = { lat: Number(p.lat), lng: Number(p.lng) }
+    }
+    return acc
+  }, {})
+
+  // Resolusi koordinat kerawanan: pakai lat/lng item, fallback ke koordinat pos
+  const resolveCoord = (k) => {
+    const lat = Number(k.lat)
+    const lng = Number(k.lng)
+    if (k.lat && k.lng && !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+      return { lat, lng }
+    }
+    // Fallback: koordinat pos
+    return posCoordMap[k.pos_id] || null
+  }
+
+  // Filter kerawanan berdasarkan mapLayers (per sub-layer kategori)
+  const visibleKerawanan = kerawananList
+    .filter(k => {
+      if (!showKerawanan) return false
+      // cek sub-layer berdasarkan kategori
+      const layerKey = KATEGORI_TO_LAYER[k.kategori]
+      if (!layerKey || !mapLayers[layerKey]) return false
+      // harus punya koordinat (sendiri atau dari pos)
+      return resolveCoord(k) !== null
+    })
+    .map(k => ({ ...k, _coord: resolveCoord(k) }))
 
   return (
     <div style={{ height, width: '100%' }} className="relative">
@@ -89,9 +120,12 @@ export function PamtasMap({
         {mapLayers.pos && (
           <LayerGroup>
             {validPos.map((pos) => {
-              // pos_id dipakai langsung sebagai label marker
               const isSelected = pos.pos_id === selectedPosId
               const isKotis = pos.pos_id === 'KT'
+              // Hitung kerawanan aktif untuk pos ini
+              const posActiveKerawanan = kerawananList.filter(
+                k => k.pos_id === pos.pos_id && k.status?.toLowerCase() === 'aktif'
+              ).length
               return (
                 <Marker
                   key={pos.pos_id}
@@ -103,7 +137,11 @@ export function PamtasMap({
                   zIndexOffset={isKotis ? 2000 : isSelected ? 1000 : 0}
                 >
                   <Popup maxWidth={300} className="military-popup">
-                    <PosPopup pos={pos} onDetailClick={(id) => navigate(`/pos/${id}`)} />
+                    <PosPopup
+                      pos={pos}
+                      onDetailClick={(id) => navigate(`/pos/${id}`)}
+                      activeKerawanan={posActiveKerawanan}
+                    />
                   </Popup>
                 </Marker>
               )
@@ -112,13 +150,14 @@ export function PamtasMap({
         )}
 
         {/* ── Kerawanan markers ────────────────────────── */}
-        {showKerawanan && mapLayers.kerawanan && (
+        {showKerawanan && (
           <LayerGroup>
-            {visibleKerawanan.map((item) => (
+            {visibleKerawanan.map((item, i) => (
               <Marker
-                key={item.id}
-                position={[Number(item.lat), Number(item.lng)]}
-                icon={createKerawananIcon(item.kategori, item.status === 'aktif')}
+                key={item.id || i}
+                position={[item._coord.lat, item._coord.lng]}
+                icon={createKerawananIcon(item.kategori, item.status?.toLowerCase() === 'aktif')}
+                zIndexOffset={500}
               >
                 <Popup maxWidth={220} className="military-popup">
                   <KerawananPopup item={item} />

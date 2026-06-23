@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useApp } from '../../context/AppContext'
+import { useAuth } from '../../context/AuthContext'
 import { exportToPDF } from '../../utils/exportPDF'
 
 export function TopBar() {
   const { toggleSidebar, togglePresentation, presentationMode, sidebarOpen } = useApp()
+  const { profile, signOut } = useAuth()
   const [currentTime, setCurrentTime] = useState(new Date())
 
   useEffect(() => {
@@ -92,6 +94,31 @@ export function TopBar() {
       {/* ── RIGHT: actions ────────────────────────────────── */}
       <div className="topbar-nav flex items-center gap-1 flex-shrink-0">
 
+        {/* User info pill */}
+        {profile && (
+          <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-sm mr-1"
+            style={{
+              background: 'rgba(0,255,136,0.05)',
+              border: '1px solid rgba(0,255,136,0.15)',
+            }}
+          >
+            <div className="w-1.5 h-1.5 rounded-full bg-[#00ff88] flex-shrink-0"
+              style={{ boxShadow: '0 0 4px rgba(0,255,136,0.8)' }} />
+            <span className="font-mono text-[9px] text-[rgba(0,255,136,0.7)] tracking-wider uppercase truncate max-w-[80px]">
+              {profile.nama || profile.role}
+            </span>
+            <span className="text-[8px] px-1 py-0.5 rounded-sm uppercase tracking-wider flex-shrink-0"
+              style={{
+                color: profile.role === 'admin' ? '#ffaa00' : profile.role === 'operator' ? '#4488ff' : 'rgba(200,214,229,0.4)',
+                background: profile.role === 'admin' ? 'rgba(255,170,0,0.1)' : profile.role === 'operator' ? 'rgba(68,136,255,0.1)' : 'rgba(200,214,229,0.05)',
+                border: `1px solid ${profile.role === 'admin' ? 'rgba(255,170,0,0.25)' : profile.role === 'operator' ? 'rgba(68,136,255,0.25)' : 'rgba(200,214,229,0.1)'}`,
+              }}
+            >
+              {profile.role}
+            </span>
+          </div>
+        )}
+
         {/* Presentasi */}
         <HudIconBtn
           onClick={togglePresentation}
@@ -107,8 +134,15 @@ export function TopBar() {
         {/* Fullscreen */}
         <HudIconBtn
           onClick={() => {
-            if (!document.fullscreenElement) document.documentElement.requestFullscreen()
-            else document.exitFullscreen()
+            try {
+              if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {})
+              } else {
+                document.exitFullscreen().catch(() => {})
+              }
+            } catch {
+              // requestFullscreen tidak didukung browser ini — abaikan
+            }
           }}
           title="Fullscreen"
         >
@@ -126,6 +160,18 @@ export function TopBar() {
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          </svg>
+        </HudIconBtn>
+
+        {/* Logout */}
+        <HudIconBtn
+          onClick={signOut}
+          title="Logout"
+          danger
+        >
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
         </HudIconBtn>
       </div>
@@ -147,15 +193,17 @@ function TelePill({ label, value, color }) {
   )
 }
 
-function HudIconBtn({ onClick, title, active, children }) {
+function HudIconBtn({ onClick, title, active, danger, children }) {
   return (
     <button
       onClick={onClick}
       title={title}
       className={`p-1.5 rounded-sm border transition-all ${
-        active
-          ? 'border-[rgba(0,255,136,0.6)] text-[#00ff88] bg-[rgba(0,255,136,0.12)]'
-          : 'border-transparent text-[rgba(200,214,229,0.35)] hover:text-[#00ff88] hover:border-[rgba(0,255,136,0.3)] hover:bg-[rgba(0,255,136,0.06)]'
+        danger
+          ? 'border-transparent text-[rgba(255,51,51,0.4)] hover:text-[#ff3333] hover:border-[rgba(255,51,51,0.3)] hover:bg-[rgba(255,51,51,0.06)]'
+          : active
+            ? 'border-[rgba(0,255,136,0.6)] text-[#00ff88] bg-[rgba(0,255,136,0.12)]'
+            : 'border-transparent text-[rgba(200,214,229,0.35)] hover:text-[#00ff88] hover:border-[rgba(0,255,136,0.3)] hover:bg-[rgba(0,255,136,0.06)]'
       }`}
     >
       {children}

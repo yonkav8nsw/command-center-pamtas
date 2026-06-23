@@ -1,13 +1,13 @@
 import { NavLink } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
-import { usePos, useAllKerawanan } from '../../hooks/useGasApi'
+import { usePos, useAllKerawanan } from '../../hooks/useSupabase'
 
 export function Sidebar() {
   const { sidebarOpen } = useApp()
   const { data: posList, loading } = usePos()
   const { data: kerawanan } = useAllKerawanan()
 
-  const activeKraw = (kerawanan || []).filter(k => k.status === 'aktif').length
+  const activeKraw = (kerawanan || []).filter(k => k.status?.toLowerCase() === 'aktif').length
 
   return (
     <aside
@@ -119,7 +119,7 @@ function NavItem({ to, icon, label, end, badge, badgeDanger }) {
 
 function PosNavItem({ pos, kerawanan }) {
   const posNum   = pos.pos_id.replace('POS-', '')
-  const hasRawan = kerawanan.some(k => k.pos_id === pos.pos_id && k.status === 'aktif')
+  const hasRawan = kerawanan.some(k => k.pos_id === pos.pos_id && k.status?.toLowerCase() === 'aktif')
   return (
     <NavLink
       to={`/pos/${pos.pos_id}`}

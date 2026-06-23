@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { KERAWANAN_CATEGORIES } from '../../constants/kerawananCategories'
-import { FormField, FormActions } from './TokohForm'
+import { FormField, FormActions, FormError } from './TokohForm'
 
 export function KerawananForm({ posId, onSave, onCancel }) {
   const today = new Date().toISOString().slice(0, 10)
@@ -16,16 +16,29 @@ export function KerawananForm({ posId, onSave, onCancel }) {
     foto_url:      '',
   })
   const [saving, setSaving] = useState(false)
+  const [fieldError, setFieldError] = useState('')
 
-  const set = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
+  const set = (key) => (e) => {
+    setFieldError('')
+    setForm(f => ({ ...f, [key]: e.target.value }))
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!form.kategori) return alert('Kategori wajib dipilih')
-    if (!form.deskripsi.trim()) return alert('Deskripsi tidak boleh kosong')
+    if (!form.kategori) {
+      setFieldError('Kategori wajib dipilih')
+      return
+    }
+    if (!form.deskripsi.trim()) {
+      setFieldError('Deskripsi tidak boleh kosong')
+      return
+    }
     setSaving(true)
+    setFieldError('')
     try {
       await onSave(form)
+    } catch (err) {
+      setFieldError(err.message || 'Gagal menyimpan laporan')
     } finally {
       setSaving(false)
     }
@@ -134,14 +147,17 @@ export function KerawananForm({ posId, onSave, onCancel }) {
       {(!form.lat || !form.lng) && (
         <div className="flex items-center gap-2 px-3 py-2 rounded-sm"
           style={{ background: 'rgba(255,170,0,0.06)', border: '1px solid rgba(255,170,0,0.2)' }}>
-          <span className="text-[#ffaa00] text-xs">⚠</span>
+          <span className="text-[#ffaa00] text-xs flex-shrink-0">⚠</span>
           <span className="text-[10px] text-[rgba(255,170,0,0.7)]">
             Tanpa koordinat, marker tidak muncul di peta.
           </span>
         </div>
       )}
 
+      {fieldError && <FormError message={fieldError} />}
+
       <FormActions onCancel={onCancel} saving={saving} submitLabel="Laporkan" />
     </form>
   )
 }
+

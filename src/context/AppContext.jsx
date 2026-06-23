@@ -12,12 +12,14 @@ export function AppProvider({ children }) {
   // Filter marker yang tampil di peta
   const [mapLayers, setMapLayers] = useState({
     pos:        true,   // marker pos satgas
-    kerawanan:  true,   // marker kerawanan umum
-    kriminal:   true,   // sub: kriminal
+    kerawanan:  true,   // marker kerawanan (master toggle)
+    narkoba:    true,   // sub: narkotika
+    kriminal:   true,   // sub: tindak kriminal
     logging:    true,   // sub: ilegal logging
-    mining:     true,   // sub: illegal mining
-    trafficking:true,   // sub: human trafficking
-    batas:      true,   // batas negara RI-Malaysia
+    trading:    true,   // sub: penyelundupan barang
+    trafficking:true,   // sub: perdagangan orang
+    border:     true,   // sub: patok perbatasan
+    pmInp:      true,   // sub: PMI Non-Prosedural
     binter:     false,  // marker kegiatan binter
   })
 

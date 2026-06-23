@@ -5,11 +5,28 @@ import { LoadingSpinner } from '../ui/LoadingSpinner'
 
 export function DemografiTable({ demografi, loading }) {
   if (loading) return <LoadingSpinner text="Memuat data demografi..." />
-  if (!demografi) return (
+
+  // Jika GAS tetap mengembalikan array (fallback), aggregate di sini juga
+  const demo = Array.isArray(demografi)
+    ? demografi.length > 0
+      ? demografi.reduce((acc, row) => {
+          const NUM = ['total_penduduk','total_kk','islam','kristen','katolik','hindu','buddha','konghucu','lainnya','masjid','gereja','pura','vihara']
+          NUM.forEach(f => { acc[f] = (Number(acc[f]||0)) + (Number(row[f]||0)) })
+          return acc
+        }, { ...demografi[0] })
+      : null
+    : demografi
+
+  if (!demo) return (
     <p className="text-[rgba(200,214,229,0.3)] text-xs tracking-wider text-center py-6 uppercase">
       Data demografi belum tersedia
     </p>
   )
+
+  // gunakan `demo` sebagai alias agar kode di bawah tetap menggunakan variable yang benar
+  // (kita re-assign demografi ke demo)
+  // eslint-disable-next-line no-param-reassign
+  demografi = demo
 
   const total = Number(demografi.total_penduduk || 0)
 

@@ -3,8 +3,35 @@ import { LoadingSpinner } from '../ui/LoadingSpinner'
 import { EmptyState } from '../ui/EmptyState'
 import { Modal } from '../ui/Modal'
 import { TokohForm } from '../forms/TokohForm'
-import { api } from '../../services/api'
-import { clearCache } from '../../hooks/useGasApi'
+import { useToast } from '../ui/Toast'
+import { useConfirm } from '../ui/ConfirmDialog'
+import { tokohService } from '../../services/tokoh.service'
+import { clearCache } from '../../hooks/useSupabase'
+
+// Mapping kategori dari Google Sheets ke display label + warna
+// Sheet bisa pakai: TOMAS/TODAT/TOGA atau Adat/Masyarakat/Agama
+const KATEGORI_NORMALIZE = {
+  // Nilai dari sheet (uppercase)
+  'TOMAS':      'Masyarakat',
+  'TODAT':      'Adat',
+  'TOGA':       'Agama',
+  // Nilai lama (sudah benar)
+  'Adat':       'Adat',
+  'Masyarakat': 'Masyarakat',
+  'Agama':      'Agama',
+  // Variasi case-insensitive fallback
+  'tomas':      'Masyarakat',
+  'todat':      'Adat',
+  'toga':       'Agama',
+  'adat':       'Adat',
+  'masyarakat': 'Masyarakat',
+  'agama':      'Agama',
+}
+
+function normalizeKategori(raw) {
+  if (!raw) return 'Masyarakat'
+  return KATEGORI_NORMALIZE[raw] || KATEGORI_NORMALIZE[raw.trim()] || 'Masyarakat'
+}
 
 const KATEGORI_COLOR = {
   Adat:       { color: '#ffaa00', bg: 'rgba(255,170,0,0.08)',   border: 'rgba(255,170,0,0.2)'   },
@@ -13,6 +40,8 @@ const KATEGORI_COLOR = {
 }
 
 export function TokohList({ tokohList, loading, posId, onRefresh }) {
+  const { showToast } = useToast()
+  const { confirm } = useConfirm()
   const [showForm, setShowForm] = useState(false)
   const [editData, setEditData] = useState(null)
   const [deleting, setDeleting] = useState(null)
@@ -20,28 +49,34 @@ export function TokohList({ tokohList, loading, posId, onRefresh }) {
   const handleSave = async (data) => {
     try {
       if (editData) {
-        await api.updateTokoh({ ...data, id: editData.id })
+        await tokohService.update(editData.id, data)
       } else {
-        await api.addTokoh({ ...data, pos_id: posId })
+        await tokohService.add({ ...data, pos_id: posId })
       }
       clearCache()
       onRefresh && onRefresh()
       setShowForm(false)
       setEditData(null)
+      showToast(editData ? 'Data tokoh berhasil diperbarui' : 'Tokoh baru berhasil ditambahkan', 'success')
     } catch (err) {
-      alert('Gagal menyimpan: ' + err.message)
+      showToast('Gagal menyimpan: ' + err.message, 'error')
     }
   }
 
   const handleDelete = async (tokoh) => {
-    if (!confirm(`Hapus tokoh "${tokoh.nama}"?`)) return
+    const ok = await confirm(`Hapus tokoh "${tokoh.nama}"? Tindakan ini tidak dapat dibatalkan.`, {
+      title: 'Hapus Tokoh',
+      type: 'danger',
+    })
+    if (!ok) return
     setDeleting(tokoh.id)
     try {
-      await api.deleteTokoh({ id: tokoh.id, pos_id: posId })
+      await tokohService.remove(tokoh.id)
       clearCache()
       onRefresh && onRefresh()
+      showToast(`Tokoh "${tokoh.nama}" berhasil dihapus`, 'success')
     } catch (err) {
-      alert('Gagal menghapus: ' + err.message)
+      showToast('Gagal menghapus: ' + err.message, 'error')
     } finally {
       setDeleting(null)
     }
@@ -49,16 +84,22 @@ export function TokohList({ tokohList, loading, posId, onRefresh }) {
 
   if (loading) return <LoadingSpinner text="Memuat data tokoh..." />
 
+  // Normalisasi kategori dari sheet (TOMAS/TODAT/TOGA) ke display (Masyarakat/Adat/Agama)
+  const normalizedList = (tokohList || []).map(t => ({
+    ...t,
+    _kategoriDisplay: normalizeKategori(t.kategori),
+  }))
+
   const grouped = {
-    Adat:       (tokohList || []).filter(t => t.kategori === 'Adat'),
-    Masyarakat: (tokohList || []).filter(t => t.kategori === 'Masyarakat'),
-    Agama:      (tokohList || []).filter(t => t.kategori === 'Agama'),
+    Adat:       normalizedList.filter(t => t._kategoriDisplay === 'Adat'),
+    Masyarakat: normalizedList.filter(t => t._kategoriDisplay === 'Masyarakat'),
+    Agama:      normalizedList.filter(t => t._kategoriDisplay === 'Agama'),
   }
 
   return (
     <div className="space-y-4 fade-in">
       <div className="flex justify-between items-center">
-        <span className="hud-label">{(tokohList || []).length} tokoh terdaftar</span>
+        <span className="hud-label">{normalizedList.length} tokoh terdaftar</span>
         <button
           className="hud-btn"
           onClick={() => { setEditData(null); setShowForm(true) }}
@@ -67,7 +108,7 @@ export function TokohList({ tokohList, loading, posId, onRefresh }) {
         </button>
       </div>
 
-      {(tokohList || []).length === 0 ? (
+      {normalizedList.length === 0 ? (
         <EmptyState
           icon="◈"
           title="Belum ada data tokoh"
@@ -96,9 +137,9 @@ export function TokohList({ tokohList, loading, posId, onRefresh }) {
               <div className="space-y-1.5">
                 {list.map(tokoh => (
                   <TokohCard
-                    key={tokoh.id}
+                    key={tokoh.id || tokoh.nama}
                     tokoh={tokoh}
-                    kategori={kategori}
+                    kategori={tokoh._kategoriDisplay}
                     onEdit={() => { setEditData(tokoh); setShowForm(true) }}
                     onDelete={() => handleDelete(tokoh)}
                     deleting={deleting === tokoh.id}
@@ -138,9 +179,9 @@ function TokohCard({ tokoh, kategori, onEdit, onDelete, deleting }) {
         <p className="text-[10px] mt-0.5" style={{ color: `${pal.color}80` }}>{tokoh.jabatan}</p>
         <div className="flex items-center flex-wrap gap-3 mt-1.5 text-[10px] text-[rgba(200,214,229,0.4)]">
           {tokoh.alamat && <span>📍 {tokoh.alamat}</span>}
-          {tokoh.no_telp && (
-            <a href={`tel:${tokoh.no_telp}`} className="text-[rgba(0,255,136,0.6)] hover:text-[#00ff88] transition-colors">
-              📞 {tokoh.no_telp}
+          {tokoh.no_hp && (
+            <a href={`tel:${tokoh.no_hp}`} className="text-[rgba(0,255,136,0.6)] hover:text-[#00ff88] transition-colors">
+              📞 {tokoh.no_hp}
             </a>
           )}
         </div>

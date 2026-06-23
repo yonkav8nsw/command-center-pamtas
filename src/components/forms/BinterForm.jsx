@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { BINTER_TYPES } from '../../constants/kerawananCategories'
-import { FormField, FormActions } from './TokohForm'
+import { FormField, FormActions, FormError } from './TokohForm'
 
 export function BinterForm({ posId, onSave, onCancel }) {
   const today = new Date().toISOString().slice(0, 10)
@@ -14,20 +14,38 @@ export function BinterForm({ posId, onSave, onCancel }) {
     foto_url:        '',
   })
   const [saving, setSaving] = useState(false)
+  const [fieldError, setFieldError] = useState('')
 
-  const set = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
+  const set = (key) => (e) => {
+    setFieldError('')
+    setForm(f => ({ ...f, [key]: e.target.value }))
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!form.jenis_kegiatan.trim()) return alert('Jenis kegiatan tidak boleh kosong')
-    if (!form.tanggal) return alert('Tanggal tidak boleh kosong')
+    if (!form.jenis_kegiatan.trim()) {
+      setFieldError('Jenis kegiatan tidak boleh kosong')
+      return
+    }
+    if (!form.tanggal) {
+      setFieldError('Tanggal tidak boleh kosong')
+      return
+    }
     setSaving(true)
+    setFieldError('')
     try {
       await onSave(form)
+    } catch (err) {
+      setFieldError(err.message || 'Gagal menyimpan kegiatan')
     } finally {
       setSaving(false)
     }
   }
+
+  // Fallback jika BINTER_TYPES tidak tersedia di constants
+  const jenisList = (BINTER_TYPES && BINTER_TYPES.length > 0)
+    ? BINTER_TYPES
+    : ['Penyuluhan', 'Baksos', 'Olahraga Bersama', 'Karya Bhakti', 'Kunjungan', 'Lainnya']
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
@@ -46,9 +64,7 @@ export function BinterForm({ posId, onSave, onCancel }) {
         <FormField label="Jenis Kegiatan *">
           <select className="hud-select" value={form.jenis_kegiatan} onChange={set('jenis_kegiatan')} required>
             <option value="">-- Pilih --</option>
-            {(BINTER_TYPES || [
-              'Penyuluhan', 'Baksos', 'Olahraga Bersama', 'Karya Bhakti', 'Kunjungan', 'Lainnya'
-            ]).map(t => (
+            {jenisList.map(t => (
               <option key={t} value={t}>{t}</option>
             ))}
           </select>
@@ -103,7 +119,11 @@ export function BinterForm({ posId, onSave, onCancel }) {
         </FormField>
 
       </div>
+
+      {fieldError && <FormError message={fieldError} />}
+
       <FormActions onCancel={onCancel} saving={saving} />
     </form>
   )
 }
+

@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import {
-  useDemografi, useTokoh, useBinter, useKerawanan
-} from '../hooks/useGasApi'
-import { usePos } from '../hooks/useGasApi'
+  useDemografi, useTokoh, useBinter, useKerawanan, usePos
+} from '../hooks/useSupabase'
 import { DemografiTable } from '../components/pos/DemografiTable'
 import { GeoDemoKonsos } from '../components/pos/GeoDemoKonsos'
 import { TokohList } from '../components/pos/TokohList'
@@ -28,10 +27,19 @@ export default function PosDetailPage() {
   const navigate  = useNavigate()
   const { setSelectedPosId } = useApp()
 
-  const [activeTab, setActiveTab] = useState(() => {
-    const validTabs = ['info', 'demografi', 'geodemo', 'tokoh', 'binter', 'kerawanan', 'foto']
-    return validTabs.includes(tab) ? tab : 'info'
-  })
+  const VALID_TABS = ['info', 'demografi', 'geodemo', 'tokoh', 'binter', 'kerawanan', 'foto']
+  const normalizedTab = tab?.toLowerCase()
+  const [activeTab, setActiveTab] = useState(
+    VALID_TABS.includes(normalizedTab) ? normalizedTab : 'info'
+  )
+
+  // Sync activeTab jika URL tab berubah (navigasi langsung via URL)
+  useEffect(() => {
+    const t = tab?.toLowerCase()
+    if (VALID_TABS.includes(t) && t !== activeTab) {
+      setActiveTab(t)
+    }
+  }, [tab]) // eslint-disable-line
 
   const { data: posList, loading: posListLoading, error: posListError } = usePos()
   const pos = (posList || []).find(p => p.pos_id === posId)

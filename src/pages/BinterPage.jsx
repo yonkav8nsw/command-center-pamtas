@@ -1,21 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAllBinter, usePos } from '../hooks/useGasApi'
-import { BINTER_TYPES } from '../constants/kerawananCategories'
+import { useAllBinter, usePos } from '../hooks/useSupabase'
+import { BINTER_TYPES, BINTER_COLOR_MAP } from '../constants/kerawananCategories'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
 import { EmptyState } from '../components/ui/EmptyState'
 import { formatDate } from '../utils/formatDate'
 
-const JENIS_COLOR = {
-  'Penyuluhan':        '#00ff88',
-  'Baksos':            '#4488ff',
-  'Olahraga Bersama':  '#ffaa00',
-  'Karya Bhakti':      '#bb88ff',
-  'Kunjungan':         '#ff88cc',
-}
 function getColor(jenis) {
-  for (const [k, v] of Object.entries(JENIS_COLOR)) {
-    if (jenis?.toLowerCase().includes(k.toLowerCase())) return v
+  if (!jenis) return 'rgba(200,214,229,0.5)'
+  for (const [key, val] of Object.entries(BINTER_COLOR_MAP)) {
+    if (jenis.toLowerCase().includes(key.toLowerCase())) return val
   }
   return 'rgba(200,214,229,0.5)'
 }

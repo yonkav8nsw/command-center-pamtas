@@ -79,42 +79,92 @@ export function createPosIcon(posId, isSelected = false, isKotis = false) {
 }
 
 /**
- * Kerawanan marker — pulse ring merah
+ * Kerawanan marker — circle shape, warna per kategori baru
  */
 export function createKerawananIcon(kategori, isActive = true) {
-  const color = KERAWANAN_COLOR_MAP[kategori] || '#6b7280'
+  // Warna per kategori — seragam dengan filter bar di OverviewPage
+  // Warna per kategori — alias nama lama di sheet juga dipetakan
+  const colorMap = {
+    // kategori resmi baru
+    'Narkoba':    '#dc2626',
+    'Kriminal':   '#ef4444',
+    'Logging':    '#d97706',
+    'Trading':    '#f59e0b',
+    'Trafficking':'#db2777',
+    'Border':     '#0ea5e9',
+    'PMI NP':     '#ea580c',
+    // alias nama lama dari sheet
+    'Human Trafficking': '#db2777',
+    'Illegal Logging':   '#d97706',
+    'Ilegal Logging':    '#d97706',
+    'Penyelundupan':     '#f59e0b',
+    'Imigran Gelap':     '#ea580c',
+    'Penjarahan Laut':   '#ef4444',
+    'Ketergantungan':    '#f59e0b',
+    'Isolasi Wilayah':   '#f59e0b',
+  }
+  const color = colorMap[kategori] || '#ff3333'
+  const size  = 26
+
+  // Icon per kategori — alias nama lama ikut kategori yang sama
+  const iconChar = {
+    // kategori resmi baru
+    'Narkoba':    '💊',
+    'Kriminal':   '⚠',
+    'Logging':    '🌲',
+    'Trading':    '📦',
+    'Trafficking':'👤',
+    'Border':     '🚧',
+    'PMI NP':     '🚶',
+    // alias nama lama
+    'Human Trafficking': '👤',
+    'Illegal Logging':   '🌲',
+    'Ilegal Logging':    '🌲',
+    'Penyelundupan':     '📦',
+    'Imigran Gelap':     '🚶',
+    'Penjarahan Laut':   '⚠',
+    'Ketergantungan':    '📦',
+    'Isolasi Wilayah':   '📦',
+  }
+  const icon = iconChar[kategori] || '⚠'
 
   const html = `
-    <div style="position:relative; width:24px; height:24px;">
+    <div style="position:relative; width:${size}px; height:${size}px;">
       ${isActive ? `
         <div style="
-          position:absolute; inset:-5px;
+          position:absolute; inset:-6px;
           border-radius:50%;
           border: 1px solid ${color}88;
           animation: krawRing 1.8s ease-out infinite;
         "></div>
         <div style="
-          position:absolute; inset:-10px;
+          position:absolute; inset:-12px;
           border-radius:50%;
           border: 1px solid ${color}44;
           animation: krawRing 1.8s ease-out infinite 0.6s;
         "></div>
       ` : ''}
       <div style="
-        width:24px; height:24px;
-        background: radial-gradient(circle at 35% 35%, ${color}44, ${color}cc);
-        border-radius:50%;
+        width:${size}px; height:${size}px;
+        background: radial-gradient(circle at 35% 35%, ${color}33, rgba(10,5,5,0.92));
+        border-radius: 50%;
         border: 1.5px solid ${color};
-        box-shadow: 0 0 10px ${color}66;
+        box-shadow: 0 0 10px ${color}66, inset 0 0 6px ${color}1a;
         display:flex; align-items:center; justify-content:center;
       ">
-        <span style="color:white; font-weight:900; font-size:12px; line-height:1; text-shadow:0 1px 2px rgba(0,0,0,0.5);">!</span>
+        <span style="
+          color:${color};
+          font-weight:900;
+          font-size:11px;
+          line-height:1;
+          text-shadow: 0 0 6px ${color}cc;
+        ">${icon}</span>
       </div>
     </div>
     <style>
       @keyframes krawRing {
         0%   { transform: scale(1); opacity: 0.7; }
-        100% { transform: scale(2); opacity: 0; }
+        100% { transform: scale(2.2); opacity: 0; }
       }
     </style>
   `
@@ -122,9 +172,9 @@ export function createKerawananIcon(kategori, isActive = true) {
   return divIcon({
     html,
     className: '',
-    iconSize: [44, 44],
-    iconAnchor: [22, 22],
-    popupAnchor: [0, -24],
+    iconSize:    [size + 24, size + 24],
+    iconAnchor:  [size / 2 + 12, size / 2 + 12],
+    popupAnchor: [0, -(size / 2 + 14)],
   })
 }
 

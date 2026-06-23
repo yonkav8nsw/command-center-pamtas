@@ -266,6 +266,18 @@
   }
   .hud-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
+  .hud-btn-ghost {
+    border-color: rgba(200,214,229,0.15);
+    color: rgba(200,214,229,0.5);
+    background: transparent;
+  }
+  .hud-btn-ghost:hover {
+    border-color: rgba(200,214,229,0.3);
+    color: rgba(200,214,229,0.8);
+    background: rgba(200,214,229,0.05);
+  }
+  .hud-btn-ghost:disabled { opacity: 0.35; cursor: not-allowed; }
+
   .hud-btn-danger {
     border-color: rgba(255,51,51,0.4);
     color: #ff3333;

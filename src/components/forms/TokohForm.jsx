@@ -1,25 +1,41 @@
 import { useState } from 'react'
-import { TOKOH_CATEGORIES } from '../../constants/kerawananCategories'
+
+// Kategori yang dikirim ke GAS — gunakan nilai yang konsisten
+const TOKOH_CATEGORIES_FORM = [
+  { value: 'TOMAS', label: 'TOMAS (Tokoh Masyarakat)' },
+  { value: 'TODAT', label: 'TODAT (Tokoh Adat)' },
+  { value: 'TOGA',  label: 'TOGA (Tokoh Agama)' },
+]
 
 export function TokohForm({ initialData, posId, onSave, onCancel }) {
   const [form, setForm] = useState({
     nama:      initialData?.nama      || '',
-    kategori:  initialData?.kategori  || 'Adat',
+    kategori:  initialData?.kategori  || 'TOMAS',
     jabatan:   initialData?.jabatan   || '',
     alamat:    initialData?.alamat    || '',
     no_telp:   initialData?.no_telp   || '',
     catatan:   initialData?.catatan   || '',
   })
   const [saving, setSaving] = useState(false)
+  const [fieldError, setFieldError] = useState('')
 
-  const set = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
+  const set = (key) => (e) => {
+    setFieldError('')
+    setForm(f => ({ ...f, [key]: e.target.value }))
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!form.nama.trim()) return alert('Nama tidak boleh kosong')
+    if (!form.nama.trim()) {
+      setFieldError('Nama tidak boleh kosong')
+      return
+    }
     setSaving(true)
+    setFieldError('')
     try {
       await onSave(form)
+    } catch (err) {
+      setFieldError(err.message || 'Gagal menyimpan data')
     } finally {
       setSaving(false)
     }
@@ -40,8 +56,8 @@ export function TokohForm({ initialData, posId, onSave, onCancel }) {
 
         <FormField label="Kategori">
           <select className="hud-select" value={form.kategori} onChange={set('kategori')}>
-            {(TOKOH_CATEGORIES || ['Adat', 'Masyarakat', 'Agama']).map(k => (
-              <option key={k} value={k}>{k}</option>
+            {TOKOH_CATEGORIES_FORM.map(k => (
+              <option key={k.value} value={k.value}>{k.label}</option>
             ))}
           </select>
         </FormField>
@@ -85,6 +101,8 @@ export function TokohForm({ initialData, posId, onSave, onCancel }) {
         </FormField>
       </div>
 
+      {fieldError && <FormError message={fieldError} />}
+
       <FormActions onCancel={onCancel} saving={saving} />
     </form>
   )
@@ -96,6 +114,17 @@ export function FormField({ label, children, colSpan }) {
     <div className={colSpan === 2 ? 'col-span-2' : ''}>
       <label className="block hud-label mb-1">{label}</label>
       {children}
+    </div>
+  )
+}
+
+export function FormError({ message }) {
+  if (!message) return null
+  return (
+    <div className="flex items-center gap-2 px-3 py-2 rounded-sm"
+      style={{ background: 'rgba(255,60,60,0.08)', border: '1px solid rgba(255,60,60,0.3)' }}>
+      <span className="text-[#ff4444] text-xs flex-shrink-0">✕</span>
+      <span className="text-[10px] text-[rgba(255,100,100,0.9)]">{message}</span>
     </div>
   )
 }
@@ -116,8 +145,14 @@ export function FormActions({ onCancel, saving, submitLabel = 'Simpan' }) {
         className="hud-btn flex-1"
         disabled={saving}
       >
-        {saving ? 'Menyimpan…' : submitLabel}
+        {saving ? (
+          <span className="flex items-center justify-center gap-1.5">
+            <span className="inline-block w-2.5 h-2.5 border border-[#00ff88] border-t-transparent rounded-full animate-spin" />
+            Menyimpan…
+          </span>
+        ) : submitLabel}
       </button>
     </div>
   )
 }
+

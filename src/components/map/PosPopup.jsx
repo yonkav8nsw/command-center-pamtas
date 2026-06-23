@@ -34,7 +34,7 @@ function StrengthBar({ pct }) {
  * Popup marker Pos — desain HUD military 2×2 grid
  * Warna seragam hijau untuk semua pos
  */
-export function PosPopup({ pos, onDetailClick }) {
+export function PosPopup({ pos, onDetailClick, activeKerawanan = 0 }) {
   const G      = '#00ff88'
   const G_DIM  = 'rgba(0,255,136,0.55)'
   const G_FAINT= 'rgba(0,255,136,0.12)'
@@ -45,6 +45,7 @@ export function PosPopup({ pos, onDetailClick }) {
   const total  = Number(pos.jumlah_personel) || 0
   const maxRef = pos.pos_id === 'KT' ? 350 : 26
   const pct    = Math.min(100, Math.round((total / maxRef) * 100))
+  const activeK = Number(activeKerawanan) || 0
 
   const latDMS = pos.lat ? toDMS(Number(pos.lat), true)  : '—'
   const lngDMS = pos.lng ? toDMS(Number(pos.lng), false) : '—'
@@ -177,7 +178,13 @@ export function PosPopup({ pos, onDetailClick }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={rowLabel}>Keamanan</span>
-              <span style={rowVal}>AMAN</span>
+              <span style={{
+                fontSize: '9px', fontWeight: '700',
+                color: activeK > 0 ? '#ff3333' : G,
+                textShadow: activeK > 0 ? '0 0 5px rgba(255,51,51,0.5)' : '0 0 5px rgba(0,255,136,0.45)',
+              }}>
+                {activeK > 0 ? 'WASPADA' : 'AMAN'}
+              </span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={rowLabel}>Ancaman</span>
@@ -296,58 +303,158 @@ export function PosPopup({ pos, onDetailClick }) {
 }
 
 /**
- * Popup marker Kerawanan — tidak diubah
+ * Popup marker Kerawanan — HUD style, seragam dengan PosPopup
  */
 export function KerawananPopup({ item }) {
-  const isAktif = item.status === 'aktif'
+  const isAktif = item.status?.toLowerCase() === 'aktif'
+
+  const colorMap = {
+    // kategori resmi baru
+    'Narkoba':    '#dc2626',
+    'Kriminal':   '#ef4444',
+    'Logging':    '#d97706',
+    'Trading':    '#f59e0b',
+    'Trafficking':'#db2777',
+    'Border':     '#0ea5e9',
+    'PMI NP':     '#ea580c',
+    // alias nama lama dari sheet
+    'Human Trafficking': '#db2777',
+    'Illegal Logging':   '#d97706',
+    'Ilegal Logging':    '#d97706',
+    'Penyelundupan':     '#f59e0b',
+    'Imigran Gelap':     '#ea580c',
+    'Penjarahan Laut':   '#ef4444',
+    'Ketergantungan':    '#f59e0b',
+    'Isolasi Wilayah':   '#f59e0b',
+  }
+  const C      = colorMap[item.kategori] || '#ff3333'
+  const C_DIM  = `${C}88`
+  const C_FAINT= `${C}18`
+  const C_EDGE = `${C}44`
+  const TEXT   = 'rgba(200,220,210,0.80)'
+  const TEXT_D = 'rgba(200,220,210,0.45)'
+
+  const panel = {
+    background: '#0b0d10',
+    border: `1px solid ${C_EDGE}`,
+    borderRadius: '3px',
+    padding: '7px 8px',
+  }
+
   return (
-    <div style={{ minWidth: '180px', fontFamily: 'sans-serif' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+    <div style={{
+      width: '260px',
+      background: '#060810',
+      border: `1px solid ${C_EDGE}`,
+      borderRadius: '5px',
+      fontFamily: 'Inter, sans-serif',
+      overflow: 'hidden',
+      boxShadow: `0 0 18px ${C}22`,
+    }}>
+
+      {/* ── Title bar ── */}
+      <div style={{
+        background: `${C}0d`,
+        borderBottom: `1px solid ${C_EDGE}`,
+        padding: '7px 12px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}>
         <div style={{
-          width: '8px', height: '8px', borderRadius: '50%',
-          background: isAktif ? '#ff3333' : '#00ff88',
-          flexShrink: 0,
-        }} />
-        <span style={{
-          fontSize: '10px', fontWeight: '700', letterSpacing: '0.1em',
-          textTransform: 'uppercase',
-          color: isAktif ? '#ff5555' : '#00ff88',
+          fontSize: '11px', fontWeight: '900', color: C,
+          letterSpacing: '0.06em', textTransform: 'uppercase',
+          textShadow: `0 0 10px ${C}88`,
         }}>
           {item.kategori || 'Kerawanan'}
-        </span>
-      </div>
-
-      {item.deskripsi && (
-        <p style={{
-          fontSize: '11px', color: 'rgba(200,214,229,0.75)',
-          lineHeight: 1.5, margin: '0 0 8px 0',
+        </div>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '5px',
+          padding: '2px 7px',
+          background: isAktif ? 'rgba(255,51,51,0.12)' : 'rgba(0,255,136,0.08)',
+          border: `1px solid ${isAktif ? 'rgba(255,51,51,0.35)' : 'rgba(0,255,136,0.25)'}`,
+          borderRadius: '3px',
         }}>
-          {item.deskripsi}
-        </p>
-      )}
-
-      <div style={{
-        borderTop: '1px solid rgba(0,255,136,0.12)',
-        paddingTop: '8px',
-        display: 'flex', flexDirection: 'column', gap: '4px',
-      }}>
-        {item.tanggal && <KPopupRow label="Tanggal" value={formatDate(item.tanggal)} />}
-        <KPopupRow
-          label="Status"
-          value={isAktif ? '● Aktif' : '✓ Selesai'}
-          valueColor={isAktif ? '#ff5555' : '#00ff88'}
-        />
-        {item.pos_id && <KPopupRow label="Pos" value={item.pos_id} />}
+          <div style={{
+            width: '6px', height: '6px', borderRadius: '50%',
+            background: isAktif ? '#ff3333' : '#00ff88',
+            boxShadow: isAktif ? '0 0 5px rgba(255,51,51,0.8)' : '0 0 5px rgba(0,255,136,0.8)',
+            animation: isAktif ? 'kpulse 1.2s ease-in-out infinite' : 'none',
+          }} />
+          <span style={{
+            fontSize: '8px', fontWeight: '800', letterSpacing: '0.12em',
+            color: isAktif ? '#ff5555' : '#00ff88',
+            textTransform: 'uppercase',
+          }}>
+            {isAktif ? 'AKTIF' : 'DITANGANI'}
+          </span>
+        </div>
       </div>
+
+      {/* ── Body ── */}
+      <div style={{ padding: '6px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+
+        {/* Deskripsi */}
+        {item.deskripsi && (
+          <div style={{ ...panel }}>
+            <div style={{
+              fontSize: '9px', fontWeight: '700', color: C_DIM,
+              letterSpacing: '0.12em', textTransform: 'uppercase',
+              marginBottom: '5px',
+            }}>
+              ◈ KETERANGAN
+            </div>
+            <p style={{
+              fontSize: '11px', color: TEXT,
+              lineHeight: 1.55, margin: 0,
+            }}>
+              {item.deskripsi}
+            </p>
+          </div>
+        )}
+
+        {/* Info grid */}
+        <div style={{ ...panel, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
+          <InfoRow label="Tanggal" value={item.tanggal ? formatDate(item.tanggal) : '—'} textColor={TEXT} labelColor={TEXT_D} />
+          <InfoRow label="Pos" value={item.pos_id || '—'} textColor={C} labelColor={TEXT_D} />
+          {item.pelaku && <InfoRow label="Pelaku" value={item.pelaku} textColor={TEXT} labelColor={TEXT_D} />}
+        </div>
+
+        {/* Tindak lanjut */}
+        {item.tindak_lanjut && (
+          <div style={{ ...panel }}>
+            <div style={{
+              fontSize: '9px', fontWeight: '700', color: C_DIM,
+              letterSpacing: '0.12em', textTransform: 'uppercase',
+              marginBottom: '4px',
+            }}>
+              ◆ TINDAK LANJUT
+            </div>
+            <p style={{ fontSize: '10px', color: TEXT_D, lineHeight: 1.5, margin: 0 }}>
+              {item.tindak_lanjut}
+            </p>
+          </div>
+        )}
+
+      </div>
+
+      <style>{`
+        @keyframes kpulse {
+          0%, 100% { opacity: 1; }
+          50%       { opacity: 0.4; }
+        }
+      `}</style>
     </div>
   )
 }
 
-function KPopupRow({ label, value, valueColor }) {
+function InfoRow({ label, value, textColor, labelColor }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
-      <span style={{ fontSize: '10px', color: 'rgba(200,214,229,0.4)' }}>{label}</span>
-      <span style={{ fontSize: '10px', color: valueColor || 'rgba(200,214,229,0.75)', fontWeight: '500' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+      <span style={{ fontSize: '8px', color: labelColor || 'rgba(200,220,210,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+        {label}
+      </span>
+      <span style={{ fontSize: '10px', fontWeight: '700', color: textColor || 'rgba(200,220,210,0.8)' }}>
         {value}
       </span>
     </div>

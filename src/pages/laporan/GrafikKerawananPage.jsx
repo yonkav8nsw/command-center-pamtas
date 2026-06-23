@@ -1,25 +1,38 @@
-import { useAllKerawanan } from '../../hooks/useGasApi'
+import { useAllKerawanan } from '../../hooks/useSupabase'
 import { formatDate } from '../../utils/formatDate'
+import { KERAWANAN_CATEGORIES } from '../../constants/kerawananCategories'
 
-const KATEGORI_COLOR = {
-  'Kriminal':          '#ff5555',
-  'Ilegal Logging':    '#ff8844',
-  'Illegal Mining':    '#bb88ff',
-  'Human Trafficking': '#ff44aa',
-  'Lintas Batas':      '#ffaa00',
-  'Lainnya':           '#8899aa',
+// Mapping alias nama lama → nama kategori baru (konsisten dengan PamtasMap)
+const KATEGORI_ALIAS = {
+  'Human Trafficking': 'Trafficking',
+  'Illegal Logging':   'Logging',
+  'Ilegal Logging':    'Logging',
+  'Penyelundupan':     'Trading',
+  'Imigran Gelap':     'PMI NP',
+  'Penjarahan Laut':   'Kriminal',
+  'Ketergantungan':    'Trading',
+  'Isolasi Wilayah':   'Trading',
 }
+
+function resolveKategori(k) {
+  return KATEGORI_ALIAS[k] || k || 'Lainnya'
+}
+
+const KATEGORI_COLOR = KERAWANAN_CATEGORIES.reduce((acc, c) => {
+  acc[c.id] = c.color
+  return acc
+}, { 'Lainnya': '#8899aa' })
 
 export default function GrafikKerawananPage() {
   const { data: kerawanan, loading } = useAllKerawanan()
 
   const all       = kerawanan || []
-  const aktif     = all.filter(k => k.status === 'aktif')
-  const selesai   = all.filter(k => k.status === 'selesai')
+  const aktif     = all.filter(k => k.status?.toLowerCase() === 'aktif')
+  const selesai   = all.filter(k => k.status?.toLowerCase() === 'selesai')
 
-  // Hitung per kategori
+  // Hitung per kategori (resolve alias nama lama → baru)
   const byKategori = all.reduce((acc, k) => {
-    const key = k.kategori || 'Lainnya'
+    const key = resolveKategori(k.kategori)
     acc[key] = (acc[key] || 0) + 1
     return acc
   }, {})
@@ -60,9 +73,9 @@ export default function GrafikKerawananPage() {
 
           {/* Summary cards */}
           <div className="grid grid-cols-3 gap-3">
-            <StatCard label="Total Kerawanan" value={all.length}    color="#ffaa00" icon="◆" />
-            <StatCard label="Aktif"           value={aktif.length}  color="#ff3333" icon="⚠" danger={aktif.length > 0} />
-            <StatCard label="Selesai"         value={selesai.length} color="#00ff88" icon="✓" />
+            <StatCard label="Total Kerawanan" value={all.length}     color="#ffaa00" icon="◆" />
+            <StatCard label="Aktif"           value={aktif.length}   color="#ff3333" icon="⚠" danger={aktif.length > 0} />
+            <StatCard label="Ditangani"       value={selesai.length} color="#00ff88" icon="✓" />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -148,12 +161,16 @@ export default function GrafikKerawananPage() {
                           {k.pos_id}
                         </td>
                         <td className="py-1.5 px-2">
-                          <span className="px-1.5 py-0.5 rounded-sm font-bold"
-                            style={{ background: `${KATEGORI_COLOR[k.kategori] || '#8899aa'}18`,
-                                     color: KATEGORI_COLOR[k.kategori] || '#8899aa',
-                                     border: `1px solid ${KATEGORI_COLOR[k.kategori] || '#8899aa'}33` }}>
-                            {k.kategori}
-                          </span>
+                          {(() => {
+                            const resolvedKat = resolveKategori(k.kategori)
+                            const color = KATEGORI_COLOR[resolvedKat] || '#8899aa'
+                            return (
+                              <span className="px-1.5 py-0.5 rounded-sm font-bold"
+                                style={{ background: `${color}18`, color, border: `1px solid ${color}33` }}>
+                                {resolvedKat}
+                              </span>
+                            )
+                          })()}
                         </td>
                         <td className="py-1.5 px-2" style={{ color: 'rgba(200,214,229,0.4)' }}>
                           {k.tanggal ? formatDate(k.tanggal) : '—'}

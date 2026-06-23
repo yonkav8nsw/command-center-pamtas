@@ -4,48 +4,52 @@ import { EmptyState } from '../ui/EmptyState'
 import { Modal } from '../ui/Modal'
 import { BinterForm } from '../forms/BinterForm'
 import { formatDate } from '../../utils/formatDate'
-import { api } from '../../services/api'
-import { clearCache } from '../../hooks/useGasApi'
-
-const JENIS_COLOR = {
-  'Penyuluhan':        '#00ff88',
-  'Baksos':            '#4488ff',
-  'Olahraga Bersama':  '#ffaa00',
-  'Karya Bhakti':      '#bb88ff',
-  'Kunjungan':         '#ff88cc',
-}
+import { useToast } from '../ui/Toast'
+import { useConfirm } from '../ui/ConfirmDialog'
+import { binterService } from '../../services/binter.service'
+import { clearCache } from '../../hooks/useSupabase'
+import { BINTER_COLOR_MAP } from '../../constants/kerawananCategories'
 
 function getColor(jenis) {
-  for (const [key, val] of Object.entries(JENIS_COLOR)) {
-    if (jenis && jenis.toLowerCase().includes(key.toLowerCase())) return val
+  if (!jenis) return '#c8d6e5'
+  for (const [key, val] of Object.entries(BINTER_COLOR_MAP)) {
+    if (jenis.toLowerCase().includes(key.toLowerCase())) return val
   }
   return '#c8d6e5'
 }
 
 export function BinterList({ binterList, loading, posId, onRefresh }) {
+  const { showToast } = useToast()
+  const { confirm } = useConfirm()
   const [showForm, setShowForm] = useState(false)
   const [deleting, setDeleting] = useState(null)
 
   const handleSave = async (data) => {
     try {
-      await api.addBinter({ ...data, pos_id: posId })
+      await binterService.add({ ...data, pos_id: posId })
       clearCache()
       onRefresh && onRefresh()
       setShowForm(false)
+      showToast('Kegiatan Binter berhasil disimpan', 'success')
     } catch (err) {
-      alert('Gagal menyimpan: ' + err.message)
+      showToast('Gagal menyimpan: ' + err.message, 'error')
     }
   }
 
   const handleDelete = async (item) => {
-    if (!confirm(`Hapus kegiatan "${item.jenis_kegiatan}"?`)) return
+    const ok = await confirm(`Hapus kegiatan "${item.jenis_kegiatan}"? Tindakan ini tidak dapat dibatalkan.`, {
+      title: 'Hapus Kegiatan',
+      type: 'danger',
+    })
+    if (!ok) return
     setDeleting(item.id)
     try {
-      await api.deleteBinter({ id: item.id, pos_id: posId })
+      await binterService.remove(item.id)
       clearCache()
       onRefresh && onRefresh()
+      showToast('Kegiatan berhasil dihapus', 'success')
     } catch (err) {
-      alert('Gagal menghapus: ' + err.message)
+      showToast('Gagal menghapus: ' + err.message, 'error')
     } finally {
       setDeleting(null)
     }
