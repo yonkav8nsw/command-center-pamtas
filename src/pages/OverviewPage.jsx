@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { PamtasMap } from '../components/map/PamtasMap'
 import { KerawananBadge } from '../components/ui/Badge'
-import { usePos, useSummary, useAllKerawanan, useAllBinter, useAutoRefresh } from '../hooks/useSupabase'
+import { usePos, useSummary, useAllKerawanan, useAllBinter, useAutoRefresh } from '../hooks/useGasApi'
 import { formatDate } from '../utils/formatDate'
 import { useApp } from '../context/AppContext'
 import { BINTER_COLOR_MAP } from '../constants/kerawananCategories'

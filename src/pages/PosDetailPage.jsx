@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import {
   useDemografi, useTokoh, useBinter, useKerawanan, usePos, usePatroli
-} from '../hooks/useSupabase'
+} from '../hooks/useGasApi'
 import { DemografiTable } from '../components/pos/DemografiTable'
 import { GeoDemoKonsos } from '../components/pos/GeoDemoKonsos'
 import { TokohList } from '../components/pos/TokohList'

@@ -1,4 +1,4 @@
-import { useAllBinter } from '../../hooks/useSupabase'
+import { useAllBinter } from '../../hooks/useGasApi'
 import { formatDate } from '../../utils/formatDate'
 import { BINTER_COLOR_MAP } from '../../constants/kerawananCategories'
 

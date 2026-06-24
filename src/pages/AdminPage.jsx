@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { usePos } from '../hooks/useSupabase'
+import { usePos } from '../hooks/useGasApi'
 import { useAuth } from '../context/AuthContext'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
 import { Modal } from '../components/ui/Modal'

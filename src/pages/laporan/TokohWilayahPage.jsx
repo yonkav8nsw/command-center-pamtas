@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { usePos, useAllTokoh } from '../../hooks/useSupabase'
+import { usePos, useAllTokoh } from '../../hooks/useGasApi'
 
 const KATEGORI_NORMALIZE = {
   'TOMAS': 'Masyarakat', 'tomas': 'Masyarakat',

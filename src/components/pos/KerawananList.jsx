@@ -7,7 +7,7 @@ import { formatDate } from '../../utils/formatDate'
 import { useToast } from '../ui/Toast'
 import { useConfirm } from '../ui/ConfirmDialog'
 import { kerawananService } from '../../services/kerawanan.service'
-import { clearCache } from '../../hooks/useSupabase'
+import { clearCache } from '../../hooks/useGasApi'
 import { KERAWANAN_CATEGORIES } from '../../constants/kerawananCategories'
 
 function getCatColor(kategori) {

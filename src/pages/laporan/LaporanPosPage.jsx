@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { usePos, useDemografi, useTokoh, useBinter, useKerawanan, usePatroli } from '../../hooks/useSupabase'
+import { usePos, useDemografi, useTokoh, useBinter, useKerawanan, usePatroli } from '../../hooks/useGasApi'
 import { hitungKerawananPos } from '../../constants/kerawananCategories'
 import { formatDate, formatNumber } from '../../utils/formatDate'
 import { exportToPDF } from '../../utils/exportPDF'

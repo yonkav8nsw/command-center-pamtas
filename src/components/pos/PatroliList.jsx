@@ -7,7 +7,7 @@ import { formatDate } from '../../utils/formatDate'
 import { useToast } from '../ui/Toast'
 import { useConfirm } from '../ui/ConfirmDialog'
 import { patroliService } from '../../services/patroli.service'
-import { clearCache } from '../../hooks/useSupabase'
+import { clearCache } from '../../hooks/useGasApi'
 
 const JENIS_COLOR = {
   'Patroli Patok':   '#00ff88',

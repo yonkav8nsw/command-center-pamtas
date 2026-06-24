@@ -7,7 +7,7 @@ import { formatDate } from '../../utils/formatDate'
 import { useToast } from '../ui/Toast'
 import { useConfirm } from '../ui/ConfirmDialog'
 import { binterService } from '../../services/binter.service'
-import { clearCache } from '../../hooks/useSupabase'
+import { clearCache } from '../../hooks/useGasApi'
 import { BINTER_COLOR_MAP } from '../../constants/kerawananCategories'
 
 function getColor(jenis) {

@@ -1,4 +1,4 @@
-import { usePos, useAllDemografi } from '../../hooks/useSupabase'
+import { usePos, useAllDemografi } from '../../hooks/useGasApi'
 
 // Helper: ambil nilai numerik dari berbagai kemungkinan nama field
 function getNum(obj, ...keys) {

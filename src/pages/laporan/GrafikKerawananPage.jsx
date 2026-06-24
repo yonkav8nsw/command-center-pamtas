@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAllKerawanan } from '../../hooks/useSupabase'
+import { useAllKerawanan } from '../../hooks/useGasApi'
 import { formatDate } from '../../utils/formatDate'
 import { KERAWANAN_CATEGORIES, getKategoriPoin } from '../../constants/kerawananCategories'
 

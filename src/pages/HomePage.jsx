@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { useAllKerawanan, usePos, useSummary } from '../hooks/useSupabase'
+import { useAllKerawanan, usePos, useSummary } from '../hooks/useGasApi'
 
 export default function HomePage() {
   const navigate = useNavigate()

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAllBinter, usePos } from '../hooks/useSupabase'
+import { useAllBinter, usePos } from '../hooks/useGasApi'
 import { BINTER_TYPES, BINTER_COLOR_MAP } from '../constants/kerawananCategories'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
 import { EmptyState } from '../components/ui/EmptyState'

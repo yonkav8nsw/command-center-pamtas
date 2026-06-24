@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAllKerawanan, usePos } from '../hooks/useSupabase'
+import { useAllKerawanan, usePos } from '../hooks/useGasApi'
 import { KERAWANAN_CATEGORIES, getKategoriPoin } from '../constants/kerawananCategories'
 import { KerawananBadge } from '../components/ui/Badge'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'

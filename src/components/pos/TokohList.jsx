@@ -6,7 +6,7 @@ import { TokohForm } from '../forms/TokohForm'
 import { useToast } from '../ui/Toast'
 import { useConfirm } from '../ui/ConfirmDialog'
 import { tokohService } from '../../services/tokoh.service'
-import { clearCache } from '../../hooks/useSupabase'
+import { clearCache } from '../../hooks/useGasApi'
 import { isDriveUrl, driveToThumbnail } from '../../utils/driveUrl'
 
 // Mapping kategori dari Google Sheets ke display label + warna

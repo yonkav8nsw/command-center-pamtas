@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
-import { usePos, useAllKerawanan } from '../../hooks/useSupabase'
+import { usePos, useAllKerawanan } from '../../hooks/useGasApi'
 
 export function Sidebar() {
   const { sidebarOpen } = useApp()

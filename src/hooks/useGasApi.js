@@ -202,6 +202,15 @@ export function useKerawanan(posId, status) {
 }
 
 /**
+ * Hook: patroli per pos
+ * GAS belum punya endpoint patroli — return array kosong agar LaporanPosPage
+ * tidak crash. Ketika GAS sudah support getPatroli, ganti implementasi ini.
+ */
+export function usePatroli(/* posId */) {
+  return { data: [], loading: false, error: null, refetch: () => {}, refresh: () => {} }
+}
+
+/**
  * Hook: auto-refresh data setiap interval
  */
 export function useAutoRefresh(refetchFns, intervalMs = 5 * 60 * 1000) {
