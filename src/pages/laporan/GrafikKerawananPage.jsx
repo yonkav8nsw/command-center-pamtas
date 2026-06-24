@@ -24,10 +24,21 @@ const KATEGORI_COLOR = KERAWANAN_CATEGORIES.reduce((acc, c) => {
   return acc
 }, { 'Lainnya': '#8899aa' })
 
-// Mode ranking TOP POS
+// Mode ranking DAFTAR POS
 const RANK_OPTIONS = [
-  { value: 'skor',   label: 'Skor Ancaman (Weighted)' },
+  { value: 'skor',   label: 'Skor Ancaman' },
   { value: 'jumlah', label: 'Jumlah Insiden' },
+]
+
+// Skor legend items
+const SKOR_LEGEND = [
+  { label: 'Narkoba',     poin: 6, color: '#dc2626' },
+  { label: 'Trafficking', poin: 5, color: '#db2777' },
+  { label: 'PMI NP',      poin: 4, color: '#ea580c' },
+  { label: 'Trading',     poin: 3, color: '#f59e0b' },
+  { label: 'Kriminal',    poin: 2, color: '#ef4444' },
+  { label: 'Logging',     poin: 2, color: '#d97706' },
+  { label: 'Border',      poin: 1, color: '#0ea5e9' },
 ]
 
 export default function GrafikKerawananPage() {
@@ -125,9 +136,9 @@ export default function GrafikKerawananPage() {
               </div>
             </Panel>
 
-            {/* Top Pos Rawan — dengan dropdown mode */}
+            {/* Daftar Pos dengan Kerawanan Tinggi — dengan dropdown mode */}
             <Panel
-              title="TOP POS RAWAN"
+              title="DAFTAR POS DENGAN KERAWANAN TINGGI"
               action={
                 <select
                   className="hud-select text-[8px] py-0.5 px-1.5 h-5"
@@ -173,12 +184,30 @@ export default function GrafikKerawananPage() {
                   )
                 })}
               </div>
-              {/* Legend */}
+              {/* Visual score legend */}
               <div className="mt-3 pt-2 border-t border-[rgba(0,255,136,0.06)]">
                 {rankMode === 'skor' ? (
-                  <p className="text-[8px] leading-relaxed" style={{ color: 'rgba(200,214,229,0.3)' }}>
-                    Skor = jumlah poin insiden aktif (Narkoba=6, Trafficking=5, PMI NP=4, Trading=3, Kriminal/Logging=2, Border=1)
-                  </p>
+                  <div>
+                    <p className="text-[8px] uppercase tracking-[0.15em] mb-2"
+                      style={{ color: 'rgba(200,214,229,0.3)' }}>
+                      Bobot Poin per Kategori
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {SKOR_LEGEND.map(({ label, poin, color }) => (
+                        <div key={label} className="flex items-center gap-1 px-1.5 py-0.5 rounded-sm"
+                          style={{ background: `${color}12`, border: `1px solid ${color}30` }}>
+                          <div className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                            style={{ background: color, boxShadow: `0 0 4px ${color}` }} />
+                          <span className="text-[8px] font-medium" style={{ color: 'rgba(200,214,229,0.6)' }}>
+                            {label}
+                          </span>
+                          <span className="font-mono text-[9px] font-bold ml-0.5" style={{ color }}>
+                            {poin}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 ) : (
                   <p className="text-[8px] leading-relaxed" style={{ color: 'rgba(200,214,229,0.3)' }}>
                     Jumlah = total insiden (aktif + selesai)

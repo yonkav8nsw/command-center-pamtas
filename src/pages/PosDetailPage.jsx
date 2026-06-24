@@ -2,50 +2,47 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import {
-  useDemografi, useTokoh, useBinter, useKerawanan, usePos
+  useDemografi, useTokoh, useBinter, useKerawanan, usePos, usePatroli
 } from '../hooks/useSupabase'
 import { DemografiTable } from '../components/pos/DemografiTable'
 import { GeoDemoKonsos } from '../components/pos/GeoDemoKonsos'
 import { TokohList } from '../components/pos/TokohList'
 import { BinterList } from '../components/pos/BinterList'
 import { KerawananList } from '../components/pos/KerawananList'
+import { PatroliList } from '../components/pos/PatroliList'
+import { Modal } from '../components/ui/Modal'
+import { PosForm } from '../components/forms/PosForm'
 import { formatNumber } from '../utils/formatDate'
 import { hitungKerawananPos } from '../constants/kerawananCategories'
 import { isDriveUrl, driveToThumbnail } from '../utils/driveUrl'
-
-const TABS = [
-  { id: 'info',       label: 'Info Pos',      icon: '◆' },
-  { id: 'demografi',  label: 'Demografi',     icon: '◈' },
-  { id: 'geodemo',    label: 'Geo-Demo-Konsos', icon: '◬' },
-  { id: 'tokoh',      label: 'Tokoh',         icon: '◉' },
-  { id: 'binter',     label: 'Binter',        icon: '◫' },
-  { id: 'kerawanan',  label: 'Data Insiden',  icon: '⚠' },
-  { id: 'foto',       label: 'Dokumentasi',   icon: '▣' },
-]
+import { POS_TABS, VALID_POS_TABS } from '../constants/config'
+import { posService } from '../services/pos.service'
+import { useToast } from '../components/ui/Toast'
 
 export default function PosDetailPage() {
   const { posId, tab } = useParams()
   const navigate  = useNavigate()
   const location  = useLocation()
   const { setSelectedPosId } = useApp()
+  const { showToast } = useToast()
 
-  const VALID_TABS = ['info', 'demografi', 'geodemo', 'tokoh', 'binter', 'kerawanan', 'foto']
   const normalizedTab = tab?.toLowerCase()
   const [activeTab, setActiveTab] = useState(
-    VALID_TABS.includes(normalizedTab) ? normalizedTab : 'info'
+    VALID_POS_TABS.includes(normalizedTab) ? normalizedTab : 'info'
   )
+  const [editPosOpen, setEditPosOpen] = useState(false)
   // ID insiden yang harus di-highlight (dikirim via navigate state dari InsidenPage)
   const highlightId = location.state?.highlightId || null
 
   // Sync activeTab jika URL tab berubah (navigasi langsung via URL)
   useEffect(() => {
     const t = tab?.toLowerCase()
-    if (VALID_TABS.includes(t) && t !== activeTab) {
+    if (VALID_POS_TABS.includes(t) && t !== activeTab) {
       setActiveTab(t)
     }
   }, [tab]) // eslint-disable-line
 
-  const { data: posList, loading: posListLoading, error: posListError } = usePos()
+  const { data: posList, loading: posListLoading, error: posListError, refresh: posRefresh } = usePos()
   const pos = (posList || []).find(p => p.pos_id === posId)
 
   const {
@@ -64,8 +61,23 @@ export default function PosDetailPage() {
     data: kerawananList, loading: kerawananLoading, refresh: kerawananRefresh,
   } = useKerawanan(posId)
 
+  const {
+    data: patroliList, loading: patroliLoading, refresh: patroliRefresh,
+  } = usePatroli(posId)
+
   const activeKerawanan = (kerawananList || []).filter(k => k.status === 'aktif').length
   const { totalPoin, level } = hitungKerawananPos(kerawananList)
+
+  const handleSavePos = async (payload) => {
+    try {
+      await posService.update(posId, payload)
+      posRefresh()
+      setEditPosOpen(false)
+      showToast('Data pos berhasil diperbarui', 'success')
+    } catch (err) {
+      showToast('Gagal menyimpan: ' + err.message, 'error')
+    }
+  }
 
   // Sync ke map saat halaman dibuka
   useEffect(() => {
@@ -129,20 +141,19 @@ export default function PosDetailPage() {
           </div>
 
           {/* Info pills */}
-          <div className="flex-shrink-0 flex flex-wrap gap-2 justify-end">
+          <div className="flex-shrink-0 flex flex-wrap gap-2 justify-end items-start">
             {pos?.komandan_pos && (
               <InfoPill label="Komandan" value={pos.komandan_pos} />
             )}
             {pos?.jumlah_personel && (
               <InfoPill label="Personel" value={`${pos.jumlah_personel} org`} />
             )}
-            {demografi?.total_penduduk && (
-              <InfoPill label="Penduduk" value={formatNumber(demografi.total_penduduk)} color="#4488ff" />
+            {demografi?.jumlah_penduduk && (
+              <InfoPill label="Penduduk" value={formatNumber(demografi.jumlah_penduduk)} color="#4488ff" />
             )}
             {activeKerawanan > 0 && (
               <InfoPill label="Insiden" value={`${activeKerawanan} aktif`} color="#ff3333" pulse />
             )}
-            {/* Klasifikasi kerawanan */}
             {level !== 'AMAN' && (
               <InfoPill
                 label="Klasifikasi"
@@ -151,12 +162,29 @@ export default function PosDetailPage() {
                 pulse={level === 'SIAGA'}
               />
             )}
+            {/* Tombol cetak laporan */}
+            <button
+              onClick={() => navigate(`/laporan/pos/${posId}`)}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-[9px] transition-colors"
+              style={{
+                background: 'rgba(68,136,255,0.06)',
+                border: '1px solid rgba(68,136,255,0.2)',
+                color: 'rgba(68,136,255,0.7)',
+              }}
+              title="Cetak laporan pos"
+            >
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+              </svg>
+              Laporan
+            </button>
           </div>
         </div>
 
         {/* ── Tab nav ──────────────────────────────────────── */}
         <div className="flex gap-0.5 mt-3 border-b border-[rgba(0,255,136,0.1)] overflow-x-auto">
-          {TABS.map(tab => {
+          {POS_TABS.map(tab => {
             const isActive = activeTab === tab.id
             const hasBadge = tab.id === 'kerawanan' && activeKerawanan > 0
             return (
@@ -185,7 +213,7 @@ export default function PosDetailPage() {
       {/* ── Tab content ────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto p-4">
         {activeTab === 'info' && (
-          <InfoPosTab pos={pos} />
+          <InfoPosTab pos={pos} onEdit={() => setEditPosOpen(true)} />
         )}
 
         {activeTab === 'demografi' && (
@@ -193,7 +221,7 @@ export default function PosDetailPage() {
         )}
 
         {activeTab === 'geodemo' && (
-          <GeoDemoKonsos demografi={demografi} loading={demLoading} />
+          <GeoDemoKonsos demografi={demografi} pos={pos} loading={demLoading} />
         )}
 
         {activeTab === 'tokoh' && (
@@ -225,10 +253,33 @@ export default function PosDetailPage() {
           />
         )}
 
+        {activeTab === 'patroli' && (
+          <PatroliList
+            patroliList={patroliList}
+            loading={patroliLoading}
+            posId={posId}
+            onRefresh={patroliRefresh}
+          />
+        )}
+
         {activeTab === 'foto' && (
           <DokumentasiTab pos={pos} />
         )}
       </div>
+
+      {/* ── Modal edit pos ─────────────────────────────────── */}
+      <Modal
+        isOpen={editPosOpen}
+        onClose={() => setEditPosOpen(false)}
+        title={`Edit Data Pos — ${posId}`}
+        size="lg"
+      >
+        <PosForm
+          initialData={pos}
+          onSave={handleSavePos}
+          onCancel={() => setEditPosOpen(false)}
+        />
+      </Modal>
     </div>
   )
 }
@@ -254,7 +305,7 @@ function InfoPill({ label, value, color = '#00ff88', pulse }) {
   )
 }
 
-function InfoPosTab({ pos }) {
+function InfoPosTab({ pos, onEdit }) {
   if (!pos) return <div className="text-[rgba(200,214,229,0.3)] text-xs text-center py-16">Data pos tidak ditemukan</div>
 
   const sections = [
@@ -273,12 +324,23 @@ function InfoPosTab({ pos }) {
     },
     {
       title: 'KOMANDAN & PERSONEL',
-      rows: [
-        { label: 'Komandan Pos',      value: pos.komandan_pos || '—' },
-        { label: 'Danssk',            value: pos.danssk || '—' },
-        { label: 'DPP',               value: pos.dpp || '—' },
-        { label: 'Kekuatan Personel', value: pos.jumlah_personel ? `${pos.jumlah_personel} orang` : '—' },
-      ],
+      rows: pos.pos_id === 'KOTIS' || pos.pos_id === 'KT'
+        ? [
+            { label: 'Komandan Satgas',  value: pos.komandan_pos  || 'Letkol Kav Dian Kriswijaya, S.I.P.' },
+            { label: 'Pasi Intel',       value: pos.pasi_intel    || 'Lettu Kav Rudy Agustinud Abednego Siahaan, S.Tr.Han.' },
+            { label: 'Pasi Ops',         value: pos.pasi_ops      || 'Letda Kav Yudhatama Risa Alfarisi, S.Tr.Han.' },
+            { label: 'Pasi Minlog',      value: pos.pasi_minlog   || 'Lettu Kav Johan Wicaksana, S.T.' },
+            { label: 'Pasi Ter',         value: pos.pasi_ter      || 'Lettu Kav M. Afif Ma\'ruf, S.Tr.Han.' },
+            { label: 'Pabintal',         value: pos.pabintal      || 'Kapten Kav Aldo Luthfan Aldama, S.Tr.Han.' },
+            { label: 'Pa Analis',        value: pos.pa_analis     || 'Letda Kav Ridho Al Fahrizi, S.T.' },
+            { label: 'Kekuatan Personel', value: pos.jumlah_personel ? `${pos.jumlah_personel} orang` : '62 orang' },
+          ]
+        : [
+            { label: 'Komandan Pos',      value: pos.komandan_pos || '—' },
+            { label: 'Danssk',            value: pos.danssk || '—' },
+            { label: 'DPP',               value: pos.dpp || '—' },
+            { label: 'Kekuatan Personel', value: pos.jumlah_personel ? `${pos.jumlah_personel} orang` : '—' },
+          ],
     },
     {
       title: 'FASILITAS & INFRASTRUKTUR',
@@ -299,6 +361,11 @@ function InfoPosTab({ pos }) {
 
   return (
     <div className="space-y-4">
+      <div className="flex justify-end">
+        <button className="hud-btn text-[10px]" onClick={onEdit}>
+          ✎ Edit Data Pos
+        </button>
+      </div>
       {sections.map(section => (
         <div key={section.title} className="rounded-sm overflow-hidden"
           style={{ border: '1px solid rgba(0,255,136,0.12)' }}>

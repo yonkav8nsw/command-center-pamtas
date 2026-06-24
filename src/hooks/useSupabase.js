@@ -4,6 +4,7 @@ import { demografiService } from '../services/demografi.service'
 import { tokohService }     from '../services/tokoh.service'
 import { binterService }    from '../services/binter.service'
 import { kerawananService } from '../services/kerawanan.service'
+import { patroliService }   from '../services/patroli.service'
 
 // ---------------------------------------------------------------------------
 // clearCache — no-op di Supabase (tidak ada client-side cache).
@@ -169,6 +170,16 @@ export function useKerawanan(posId, status) {
   return useSupabaseData(
     () => kerawananService.getByPos(posId, status),
     [posId, status]
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Hook: patroli per pos
+// ---------------------------------------------------------------------------
+export function usePatroli(posId) {
+  return useSupabaseData(
+    () => patroliService.getByPos(posId),
+    [posId]
   )
 }
 

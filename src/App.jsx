@@ -19,6 +19,7 @@ import GrafikKerawananPage  from './pages/laporan/GrafikKerawananPage'
 import TimelineBinterPage   from './pages/laporan/TimelineBinterPage'
 import DataDemografiPage    from './pages/laporan/DataDemografiPage'
 import TokohWilayahPage     from './pages/laporan/TokohWilayahPage'
+import LaporanPosPage       from './pages/laporan/LaporanPosPage'
 
 // Error boundary global
 class GlobalErrorBoundary extends Component {
@@ -111,6 +112,7 @@ export default function App() {
                           <Route path="/laporan/binter"         element={<Safe><TimelineBinterPage /></Safe>} />
                           <Route path="/laporan/demografi"      element={<Safe><DataDemografiPage /></Safe>} />
                           <Route path="/laporan/tokoh"          element={<Safe><TokohWilayahPage /></Safe>} />
+                          <Route path="/laporan/pos/:posId"     element={<Safe><LaporanPosPage /></Safe>} />
                           <Route path="*"                       element={<Navigate to="/" replace />} />
                         </Routes>
                       </AppShell>

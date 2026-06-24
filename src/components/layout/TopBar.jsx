@@ -83,7 +83,7 @@ export function TopBar() {
       <div className="hidden md:flex flex-col items-center absolute left-1/2 -translate-x-1/2 select-none pointer-events-none">
         <h1 className="font-bold text-xs leading-tight tracking-[0.2em] uppercase text-[#00ff88]"
           style={{ textShadow: '0 0 12px rgba(0,255,136,0.5)' }}>
-          COMMAND CENTER SATGAS PAMTAS RI-MAL
+          COMMAND CENTER SATGAS PAMTAS RI-MLY
         </h1>
         <p className="text-[8px] tracking-[0.18em] uppercase mt-0.5"
           style={{ color: 'rgba(200,214,229,0.35)' }}>
@@ -154,7 +154,7 @@ export function TopBar() {
 
         {/* Print */}
         <HudIconBtn
-          onClick={() => exportToPDF('Command Center Satgas Pamtas RI-MAL TA 2026')}
+          onClick={() => exportToPDF('Command Center Satgas Pamtas RI-MLY TA 2026')}
           title="Print / Export PDF"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
