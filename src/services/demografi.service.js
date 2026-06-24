@@ -2,13 +2,15 @@ import { supabase } from '../lib/supabase'
 
 export const demografiService = {
   async getByPos(posId) {
+    // Satu pos bisa punya banyak row (per kelurahan) — kembalikan array,
+    // DemografiTable sudah handle aggregate Array.isArray()
     const { data, error } = await supabase
       .from('demografi')
       .select('*')
       .eq('pos_id', posId)
-      .single()
-    if (error && error.code !== 'PGRST116') throw error // PGRST116 = no rows
-    return data ?? null
+      .order('nama_kelurahan')
+    if (error) throw error
+    return data?.length ? data : null
   },
 
   async getAll() {

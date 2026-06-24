@@ -79,10 +79,10 @@ export function useSummary() {
       ])
       const totals = demografi.reduce(
         (acc, d) => {
-          acc.total_penduduk += (d.jumlah_penduduk ?? 0)
-          acc.total_kk       += (d.jumlah_kk       ?? 0)
-          acc.total_laki     += (d.laki_laki        ?? 0)
-          acc.total_perempuan+= (d.perempuan        ?? 0)
+          acc.total_penduduk += (d.total_penduduk ?? d.jumlah_penduduk ?? 0)
+          acc.total_kk       += (d.total_kk       ?? d.jumlah_kk       ?? 0)
+          acc.total_laki     += (d.laki_laki       ?? 0)
+          acc.total_perempuan+= (d.perempuan       ?? 0)
           return acc
         },
         { total_penduduk: 0, total_kk: 0, total_laki: 0, total_perempuan: 0 }
