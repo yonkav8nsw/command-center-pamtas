@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { usePos, useDemografi, useTokoh, useBinter, useKerawanan, usePatroli } from '../../hooks/useSupabase'
 import { hitungKerawananPos } from '../../constants/kerawananCategories'
 import { formatDate, formatNumber } from '../../utils/formatDate'
+import { aggregateDemografi } from '../../utils/demografi'
 import { exportToPDF } from '../../utils/exportPDF'
 import { APP_CONFIG } from '../../constants/config'
 
@@ -10,11 +11,13 @@ export default function LaporanPosPage() {
   const navigate  = useNavigate()
 
   const { data: posList }         = usePos()
-  const { data: demografi }       = useDemografi(posId)
+  const { data: demografiRaw }    = useDemografi(posId)
   const { data: tokohList }       = useTokoh(posId)
   const { data: binterList }      = useBinter(posId)
   const { data: kerawananList }   = useKerawanan(posId)
   const { data: patroliList }     = usePatroli(posId)
+
+  const demografi = aggregateDemografi(demografiRaw)
 
   const pos = (posList || []).find(p => p.pos_id === posId)
   const { totalPoin, level } = hitungKerawananPos(kerawananList)
@@ -109,10 +112,11 @@ export default function LaporanPosPage() {
         <Section title="III. DATA DEMOGRAFI WILAYAH">
           {demografi ? (
             <TwoColTable rows={[
-              ['Total Penduduk',   formatNumber(demografi.total_penduduk || demografi.jumlah_penduduk) || '—'],
-              ['Jumlah KK',        formatNumber(demografi.total_kk || demografi.jumlah_kk) || '—'],
-              ['Laki-laki',        formatNumber(demografi.total_laki || demografi.laki_laki) || '—'],
-              ['Perempuan',        formatNumber(demografi.total_perempuan || demografi.perempuan) || '—'],
+              ['Total Penduduk',   formatNumber(demografi.total_penduduk) || '—'],
+              ['Jumlah KK',        formatNumber(demografi.total_kk) || '—'],
+              ['Rata-rata Jiwa/KK', demografi.total_kk > 0
+                ? (demografi.total_penduduk / demografi.total_kk).toFixed(1)
+                : '—'],
             ]} />
           ) : (
             <EmptyRow>Data demografi belum tersedia</EmptyRow>

@@ -10,14 +10,18 @@ export const binterService = {
 
     if (bulan) {
       // bulan format: 'YYYY-MM' — filter range awal dan akhir bulan
+      // Gunakan akhir bulan yang tepat dengan gte/lt untuk menghindari masalah tanggal 31
       const start = `${bulan}-01`
-      const end   = `${bulan}-31`
-      query = query.gte('tanggal', start).lte('tanggal', end)
+      const [yr, mo] = bulan.split('-').map(Number)
+      const nextMonth = mo === 12
+        ? `${yr + 1}-01-01`
+        : `${yr}-${String(mo + 1).padStart(2, '0')}-01`
+      query = query.gte('tanggal', start).lt('tanggal', nextMonth)
     }
 
     const { data, error } = await query
     if (error) throw error
-    return data
+    return data || []
   },
 
   async getAll() {
@@ -26,7 +30,7 @@ export const binterService = {
       .select('*')
       .order('tanggal', { ascending: false })
     if (error) throw error
-    return data
+    return data || []
   },
 
   async add(payload) {

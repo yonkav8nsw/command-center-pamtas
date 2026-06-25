@@ -6,23 +6,21 @@ import { EmptyState } from '../ui/EmptyState'
  *
  * Karena field geografi/demografi_notes/konsos_notes tidak ada di schema Supabase,
  * komponen ini men-derive analisis dari data demografi yang sudah tersedia
- * (jumlah_penduduk, jumlah_kk, laki_laki, perempuan) dan data pos (kabupaten, provinsi).
+ * (total_penduduk, total_kk) dan data pos (kabupaten, provinsi).
  * Field teks bebas tetap ditampilkan jika ada, sebagai override.
+ *
+ * Catatan: `demografi` yang diterima sudah berupa objek ringkasan hasil
+ * aggregateDemografi() (bukan array mentah), memakai nama kolom skema aktual.
  */
 export function GeoDemoKonsos({ demografi, pos, loading }) {
   if (loading) return <LoadingSpinner text="Memuat data..." />
   if (!demografi && !pos) return <EmptyState title="Data belum tersedia" />
 
-  // ── Derived demografi analysis ──────────────────────────
-  const penduduk  = demografi?.jumlah_penduduk  || 0
-  const kk        = demografi?.jumlah_kk        || 0
-  const lakiLaki  = demografi?.laki_laki        || 0
-  const perempuan = demografi?.perempuan        || 0
+  // ── Derived demografi analysis (nama kolom sesuai skema Supabase) ──
+  const penduduk  = demografi?.total_penduduk  || 0
+  const kk        = demografi?.total_kk        || 0
 
-  const rasioSex     = perempuan > 0 ? (lakiLaki / perempuan * 100).toFixed(1) : null
-  const rataKK       = kk > 0 ? (penduduk / kk).toFixed(1) : null
-  const pctLaki      = penduduk > 0 ? Math.round((lakiLaki / penduduk) * 100) : null
-  const pctPerempuan = penduduk > 0 ? Math.round((perempuan / penduduk) * 100) : null
+  const rataKK = kk > 0 ? (penduduk / kk).toFixed(1) : null
 
   // Klasifikasi kepadatan per KK (kasar)
   let klasifikasiDemo = '—'
@@ -94,35 +92,12 @@ export function GeoDemoKonsos({ demografi, pos, loading }) {
             <div className="grid grid-cols-2 gap-2">
               <StatBox label="Total Penduduk" value={penduduk.toLocaleString('id-ID')} unit="jiwa" color="#4488ff" />
               <StatBox label="Kepala Keluarga" value={kk.toLocaleString('id-ID')} unit="KK" color="#4488ff" />
-              <StatBox label="Laki-laki" value={lakiLaki.toLocaleString('id-ID')} unit={pctLaki !== null ? `${pctLaki}%` : 'jiwa'} color="#4488ff" />
-              <StatBox label="Perempuan" value={perempuan.toLocaleString('id-ID')} unit={pctPerempuan !== null ? `${pctPerempuan}%` : 'jiwa'} color="#bb88ff" />
             </div>
-
-            {/* Rasio bar laki-perempuan */}
-            {pctLaki !== null && (
-              <div>
-                <div className="flex justify-between text-[8px] mb-1"
-                  style={{ color: 'rgba(200,214,229,0.35)' }}>
-                  <span>Laki-laki {pctLaki}%</span>
-                  <span>Perempuan {pctPerempuan}%</span>
-                </div>
-                <div className="h-2 rounded-full overflow-hidden flex"
-                  style={{ background: 'rgba(255,255,255,0.05)' }}>
-                  <div className="h-full transition-all duration-700"
-                    style={{ width: `${pctLaki}%`, background: '#4488ff' }} />
-                  <div className="h-full flex-1"
-                    style={{ background: 'rgba(187,136,255,0.6)' }} />
-                </div>
-              </div>
-            )}
 
             {/* Derived metrics */}
             <div className="space-y-1 pt-1 border-t border-[rgba(68,136,255,0.08)]">
               {rataKK && (
                 <InfoRow label="Rata-rata Jiwa/KK" value={`${rataKK} jiwa`} />
-              )}
-              {rasioSex && (
-                <InfoRow label="Rasio Jenis Kelamin" value={`${rasioSex} (L per 100 P)`} />
               )}
               <InfoRow label="Klasifikasi" value={klasifikasiDemo} />
             </div>

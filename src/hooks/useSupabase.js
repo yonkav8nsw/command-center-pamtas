@@ -68,7 +68,9 @@ export function usePos() {
 // Pada GAS ini disediakan endpoint tersendiri. Di Supabase kita hitung
 // client-side dari getAllDemografi agar tidak perlu stored procedure tambahan.
 // Shape output disamakan dengan yang dipakai OverviewPage:
-//   { total_pos, total_penduduk, total_kk, total_laki, total_perempuan }
+//   { total_pos, total_penduduk, total_kk }
+// Catatan: skema demografi TIDAK punya kolom laki_laki/perempuan,
+// jadi tidak diakumulasi di sini.
 // ---------------------------------------------------------------------------
 export function useSummary() {
   return useSupabaseData(
@@ -77,17 +79,15 @@ export function useSummary() {
         posService.getAll(),
         demografiService.getAll(),
       ])
-      const totals = demografi.reduce(
+      const totals = (demografi || []).reduce(
         (acc, d) => {
-          acc.total_penduduk += (d.total_penduduk ?? d.jumlah_penduduk ?? 0)
-          acc.total_kk       += (d.total_kk       ?? d.jumlah_kk       ?? 0)
-          acc.total_laki     += (d.laki_laki       ?? 0)
-          acc.total_perempuan+= (d.perempuan       ?? 0)
+          acc.total_penduduk += (Number(d.total_penduduk) || 0)
+          acc.total_kk       += (Number(d.total_kk)       || 0)
           return acc
         },
-        { total_penduduk: 0, total_kk: 0, total_laki: 0, total_perempuan: 0 }
+        { total_penduduk: 0, total_kk: 0 }
       )
-      return { total_pos: posList.length, ...totals }
+      return { total_pos: (posList || []).length, ...totals }
     },
     []
   )

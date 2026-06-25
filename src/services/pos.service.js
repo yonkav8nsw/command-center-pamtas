@@ -7,7 +7,7 @@ export const posService = {
       .select('*')
       .order('pos_id')
     if (error) throw error
-    return data
+    return data || []
   },
 
   async getById(posId) {

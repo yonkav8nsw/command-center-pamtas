@@ -13,6 +13,7 @@ import { PatroliList } from '../components/pos/PatroliList'
 import { Modal } from '../components/ui/Modal'
 import { PosForm } from '../components/forms/PosForm'
 import { formatNumber } from '../utils/formatDate'
+import { aggregateDemografi } from '../utils/demografi'
 import { hitungKerawananPos } from '../constants/kerawananCategories'
 import { isDriveUrl, driveToThumbnail } from '../utils/driveUrl'
 import { POS_TABS, VALID_POS_TABS } from '../constants/config'
@@ -67,6 +68,9 @@ export default function PosDetailPage() {
 
   const activeKerawanan = (kerawananList || []).filter(k => k.status === 'aktif').length
   const { totalPoin, level } = hitungKerawananPos(kerawananList)
+
+  // Ringkasan demografi (array → objek terjumlah), pakai nama kolom skema aktual
+  const demografiSummary = aggregateDemografi(demografi)
 
   const handleSavePos = async (payload) => {
     try {
@@ -148,8 +152,8 @@ export default function PosDetailPage() {
             {pos?.jumlah_personel && (
               <InfoPill label="Personel" value={`${pos.jumlah_personel} org`} />
             )}
-            {demografi?.jumlah_penduduk && (
-              <InfoPill label="Penduduk" value={formatNumber(demografi.jumlah_penduduk)} color="#4488ff" />
+            {demografiSummary?.total_penduduk > 0 && (
+              <InfoPill label="Penduduk" value={formatNumber(demografiSummary.total_penduduk)} color="#4488ff" />
             )}
             {activeKerawanan > 0 && (
               <InfoPill label="Insiden" value={`${activeKerawanan} aktif`} color="#ff3333" pulse />
@@ -221,7 +225,7 @@ export default function PosDetailPage() {
         )}
 
         {activeTab === 'geodemo' && (
-          <GeoDemoKonsos demografi={demografi} pos={pos} loading={demLoading} />
+          <GeoDemoKonsos demografi={demografiSummary} pos={pos} loading={demLoading} />
         )}
 
         {activeTab === 'tokoh' && (

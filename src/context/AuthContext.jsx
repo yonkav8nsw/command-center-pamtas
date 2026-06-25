@@ -10,7 +10,12 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     // Ambil sesi yang sudah ada (jika user sudah login sebelumnya)
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error('[AuthContext] getSession error:', error.message)
+        setLoading(false)
+        return
+      }
       setUser(session?.user ?? null)
       if (session?.user) {
         fetchProfile(session.user.id)

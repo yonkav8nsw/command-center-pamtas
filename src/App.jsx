@@ -106,7 +106,7 @@ export default function App() {
                           {/* Alias lama supaya bookmark lama tidak 404 */}
                           <Route path="/kerawanan"              element={<Navigate to="/insiden" replace />} />
                           <Route path="/binter"                 element={<Safe><BinterPage /></Safe>} />
-                          <Route path="/admin"                  element={<Safe><AdminPage requireAdmin /></Safe>} />
+                          <Route path="/admin"                  element={<ProtectedRoute requireAdmin><Safe><AdminPage /></Safe></ProtectedRoute>} />
                           <Route path="/panduan"                element={<Safe><PanduanPage /></Safe>} />
                           <Route path="/laporan/kerawanan"      element={<Safe><GrafikKerawananPage /></Safe>} />
                           <Route path="/laporan/binter"         element={<Safe><TimelineBinterPage /></Safe>} />

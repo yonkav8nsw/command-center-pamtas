@@ -4,6 +4,20 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: '/command-center-pamtas/',
+  build: {
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks — pisahkan library besar agar build lebih efisien
+          'react-vendor':   ['react', 'react-dom', 'react-router-dom'],
+          'leaflet-vendor': ['leaflet', 'react-leaflet'],
+          'chart-vendor':   ['recharts'],
+          'supabase-vendor':['@supabase/supabase-js'],
+        },
+      },
+    },
+  },
   test: {
     environment: 'jsdom',
     globals: true,
@@ -27,10 +41,10 @@ export default defineConfig({
         'src/services/api.js',
       ],
       thresholds: {
-        lines:      85,
-        functions:  85,
-        branches:   75,
-        statements: 85,
+        lines:      90,
+        functions:  90,
+        branches:   80,
+        statements: 90,
       },
     },
   },

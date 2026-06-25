@@ -50,7 +50,7 @@ export function StatusBar() {
         <span className="text-[rgba(0,255,136,0.15)] text-xs">|</span>
 
         <span className="text-[9px] tracking-[0.08em] text-[rgba(200,214,229,0.3)] uppercase">
-          DATA <span className="font-mono text-[rgba(0,255,136,0.5)]">GOOGLE SHEETS</span>
+          DATA <span className="font-mono text-[rgba(0,255,136,0.5)]">SUPABASE</span>
         </span>
 
         <span className="text-[rgba(0,255,136,0.15)] text-xs">|</span>

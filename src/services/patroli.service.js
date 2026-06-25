@@ -8,7 +8,7 @@ export const patroliService = {
       .eq('pos_id', posId)
       .order('tanggal', { ascending: false })
     if (error) throw error
-    return data
+    return data || []
   },
 
   async getAll() {
@@ -17,7 +17,7 @@ export const patroliService = {
       .select('*')
       .order('tanggal', { ascending: false })
     if (error) throw error
-    return data
+    return data || []
   },
 
   async add(payload) {

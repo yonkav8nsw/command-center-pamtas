@@ -164,9 +164,10 @@ function KerawananCard({ item, color, label, onToggleStatus, onDelete, updating,
   const isAktif = item.status?.toLowerCase() === 'aktif'
 
   // Format jam dari tanggal
+  // Gunakan string split agar tidak ada konversi timezone browser yang bisa salah 1 hari
   const tanggalObj = item.tanggal ? new Date(item.tanggal) : null
-  const jamStr = tanggalObj
-    ? tanggalObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false })
+  const jamStr = tanggalObj && !isNaN(tanggalObj)
+    ? tanggalObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Makassar' })
     : null
   const tanggalStr = item.tanggal ? formatDate(item.tanggal) : null
 

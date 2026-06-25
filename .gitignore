@@ -23,3 +23,10 @@ Thumbs.db
 
 # Vite cache
 .vite/
+
+# Test coverage
+coverage/
+
+# Temp scripts
+pin-hosts.ps1
+.hosts-result.txt

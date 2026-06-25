@@ -6,7 +6,8 @@ import { LoadingSpinner } from '../ui/LoadingSpinner'
 export function DemografiTable({ demografi, loading }) {
   if (loading) return <LoadingSpinner text="Memuat data demografi..." />
 
-  // Jika GAS tetap mengembalikan array (fallback), aggregate di sini juga
+  // Supabase getByPos sekarang selalu return array (kosong atau berisi rows)
+  // Aggregate semua row menjadi satu objek ringkasan
   const demo = Array.isArray(demografi)
     ? demografi.length > 0
       ? demografi.reduce((acc, row) => {
@@ -14,8 +15,8 @@ export function DemografiTable({ demografi, loading }) {
           NUM.forEach(f => { acc[f] = (Number(acc[f]||0)) + (Number(row[f]||0)) })
           return acc
         }, { ...demografi[0] })
-      : null
-    : demografi
+      : null  // array kosong → belum ada data
+    : (demografi || null)  // null/undefined → belum ada data
 
   if (!demo) return (
     <p className="text-[rgba(200,214,229,0.3)] text-xs tracking-wider text-center py-6 uppercase">

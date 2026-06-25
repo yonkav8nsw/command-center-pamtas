@@ -8,7 +8,7 @@ export const tokohService = {
       .eq('pos_id', posId)
       .order('nama')
     if (error) throw error
-    return data
+    return data || []
   },
 
   async getAll() {
@@ -17,7 +17,7 @@ export const tokohService = {
       .select('*')
       .order('pos_id, nama')
     if (error) throw error
-    return data
+    return data || []
   },
 
   async add(payload) {
