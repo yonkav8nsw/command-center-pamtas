@@ -61,10 +61,12 @@
   --text-primary: #FFFFFF;
   /* Secondary text — body content, descriptions */
   --text-secondary: #B4BAC8;
-  /* Tertiary text — labels, captions, timestamps */
-  --text-tertiary: #6B748C;
-  /* Disabled, placeholder, inactive */
-  --text-disabled: #3D4456;
+  /* Tertiary text — labels, captions, timestamps (WCAG AA compliant ~4.5:1) */
+  /* Increased from #6B748C for better outdoor readability */
+  --text-tertiary: #8898AA;
+  /* Disabled, placeholder, inactive (WCAG AA ~3:1 minimum) */
+  /* Increased from #3D4456 for better outdoor readability */
+  --text-disabled: #5A6577;
   /* Text on light backgrounds */
   --text-inverse: #030305;
 
@@ -656,6 +658,41 @@
   .link-hover:hover {
     color: var(--accent-primary);
     text-decoration: underline;
+  }
+
+  /* ── Table & Data Density ─────────────────────────────── */
+
+  /* Dense table row - minimum 36px for touch */
+  .table-row-dense {
+    min-height: 36px;
+  }
+
+  /* Standard table row */
+  .table-row-standard {
+    min-height: 44px;
+  }
+
+  /* Dense text for tables */
+  .table-text-dense {
+    font-size: var(--text-xs);
+    line-height: 1.4;
+  }
+
+  /* Chart label sizing */
+  .chart-label {
+    font-size: var(--text-2xs);
+    fill: var(--text-tertiary);
+  }
+
+  /* Badge text - minimum readable size */
+  .badge-text {
+    font-size: var(--text-micro);
+    line-height: 1.2;
+  }
+
+  /* Outdoor/high-contrast mode helper */
+  .outdoor-readable {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   }
 }
 

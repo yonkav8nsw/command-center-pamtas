@@ -692,6 +692,7 @@ export default function AdminPage() {
                             className="p-1.5 rounded-sm transition-all duration-150"
                             style={{ color: 'var(--text-tertiary)', background: 'transparent' }}
                             title="Edit user"
+                            aria-label={`Edit user ${user.nama || user.email}`}
                             onMouseEnter={(e) => {
                               e.currentTarget.style.color = 'var(--accent-primary)'
                               e.currentTarget.style.background = 'var(--accent-muted)'
@@ -717,6 +718,7 @@ export default function AdminPage() {
                               opacity: deletingUserId === user.id ? 'var(--disabled-opacity)' : '1',
                             }}
                             title="Hapus user"
+                            aria-label={`Hapus user ${user.nama || user.email}`}
                             onMouseEnter={(e) => {
                               if (deletingUserId !== user.id) {
                                 e.currentTarget.style.color = 'var(--color-danger)'

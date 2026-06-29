@@ -61,13 +61,13 @@ export { Table } from './Table'
 // User feedback and notifications
 // ═══════════════════════════════════════════════════════════════════════════
 
-export { Toast, useToast, ToastProvider, ToastItemComponent } from './Toast'
-export { ConfirmDialog, useConfirm, ConfirmProvider } from './ConfirmDialog'
+export { ToastProvider, useToast, ToastItemComponent } from './Toast'
+export { useConfirm, ConfirmProvider } from './ConfirmDialog'
 export { LoadingSpinner, Spinner, Skeleton, SkeletonRow, SkeletonCard, TableSkeleton, CardGridSkeleton, ListSkeleton } from './LoadingSpinner'
 export { EmptyState } from './EmptyState'
 export { Alert, AlertTitle, AlertDescription, AlertLink } from './Alert'
 export { Progress, ProgressCircle, ProgressGroup } from './Progress'
-export { PageErrorBoundary } from './PageErrorBoundary'
+export { default as PageErrorBoundary } from './PageErrorBoundary'
 
 // ═══════════════════════════════════════════════════════════════════════════
 // DATA DISPLAY COMPONENTS

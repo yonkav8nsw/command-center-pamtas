@@ -14,15 +14,16 @@ export default function PanduanPage() {
   const [activeTab, setActiveTab] = useState('overview')
 
   return (
-    <div className="h-full overflow-y-auto bg-[#050810]">
+    <div className="h-full overflow-y-auto" style={{ background: 'var(--surface-base)' }}>
     <div className="p-4 space-y-4 fade-in max-w-4xl">
 
       {/* Header */}
       <div>
-        <h2 className="text-[rgba(200,214,229,0.85)] font-bold text-sm uppercase tracking-widest mb-1">
+        <h2 className="font-bold text-sm uppercase tracking-widest mb-1"
+          style={{ color: 'var(--text-primary)' }}>
           ◈ Panduan Input Data Google Sheets
         </h2>
-        <p className="text-[rgba(200,214,229,0.3)] text-[10px]">
+        <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
           Petunjuk pengisian data untuk operator pos — data akan otomatis tampil di dashboard
         </p>
       </div>
@@ -33,15 +34,15 @@ export default function PanduanPage() {
           <button
             key={t.id}
             onClick={() => setActiveTab(t.id)}
-            className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-sm transition-all"
+            className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-sm transition-all"
             style={activeTab === t.id ? {
-              background: 'rgba(0,255,136,0.12)',
-              border: '1px solid rgba(0,255,136,0.4)',
-              color: '#00ff88',
+              background: 'var(--accent-muted)',
+              border: '1px solid var(--accent-primary)',
+              color: 'var(--accent-primary)',
             } : {
-              background: 'rgba(0,255,136,0.03)',
-              border: '1px solid rgba(0,255,136,0.1)',
-              color: 'rgba(200,214,229,0.4)',
+              background: 'var(--surface-secondary)',
+              border: '1px solid var(--border-subtle)',
+              color: 'var(--text-tertiary)',
             }}
           >
             {t.icon} {t.label}
@@ -81,9 +82,9 @@ function Section({ title, children }) {
 function ColTable({ cols }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-[10px]">
+      <table className="w-full text-xs">
         <thead>
-          <tr style={{ borderBottom: '1px solid rgba(0,255,136,0.12)' }}>
+          <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
             {['Kolom', 'Tipe', 'Contoh Isi', 'Keterangan'].map(h => (
               <th key={h} className="px-3 py-2 text-left hud-label">{h}</th>
             ))}
@@ -92,23 +93,23 @@ function ColTable({ cols }) {
         <tbody>
           {cols.map((c, i) => (
             <tr key={c[0]} style={{
-              borderBottom: '1px solid rgba(0,255,136,0.05)',
-              background: i % 2 === 0 ? 'transparent' : 'rgba(0,255,136,0.015)',
+              borderBottom: '1px solid var(--border-subtle)',
+              background: i % 2 === 0 ? 'transparent' : 'var(--surface-secondary)',
             }}>
-              <td className="px-3 py-2 font-mono text-[rgba(0,255,136,0.8)] font-bold whitespace-nowrap">{c[0]}</td>
+              <td className="px-3 py-2 font-mono font-bold whitespace-nowrap" style={{ color: 'var(--accent-primary)' }}>{c[0]}</td>
               <td className="px-3 py-2">
-                <span className="px-1.5 py-0.5 rounded-sm text-[9px] font-bold"
+                <span className="px-1.5 py-0.5 rounded-sm font-bold"
                   style={c[1] === 'TEXT'
-                    ? { background: 'rgba(0,120,255,0.12)', color: 'rgba(100,180,255,0.8)', border: '1px solid rgba(0,120,255,0.2)' }
+                    ? { background: 'var(--color-info-subtle)', color: 'var(--color-info)', border: '1px solid var(--color-info)' }
                     : c[1] === 'NUMBER'
-                    ? { background: 'rgba(255,170,0,0.1)', color: 'rgba(255,200,80,0.8)', border: '1px solid rgba(255,170,0,0.2)' }
+                    ? { background: 'var(--color-warning-subtle)', color: 'var(--color-warning)', border: '1px solid var(--color-warning)' }
                     : c[1] === 'DATE'
-                    ? { background: 'rgba(0,255,136,0.08)', color: 'rgba(0,255,136,0.7)', border: '1px solid rgba(0,255,136,0.2)' }
-                    : { background: 'rgba(200,100,255,0.1)', color: 'rgba(200,150,255,0.8)', border: '1px solid rgba(200,100,255,0.2)' }
+                    ? { background: 'var(--accent-muted)', color: 'var(--accent-primary)', border: '1px solid var(--accent-primary)' }
+                    : { background: 'var(--color-purple-subtle)', color: 'var(--color-purple)', border: '1px solid var(--color-purple)' }
                   }>{c[1]}</span>
               </td>
-              <td className="px-3 py-2 font-mono text-[rgba(200,214,229,0.6)]">{c[2]}</td>
-              <td className="px-3 py-2 text-[rgba(200,214,229,0.45)] leading-relaxed">{c[3]}</td>
+              <td className="px-3 py-2 font-mono" style={{ color: 'var(--text-secondary)' }}>{c[2]}</td>
+              <td className="px-3 py-2 leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>{c[3]}</td>
             </tr>
           ))}
         </tbody>
@@ -119,14 +120,14 @@ function ColTable({ cols }) {
 
 function AlertBox({ type, children }) {
   const styles = {
-    info:    { bg: 'rgba(0,120,255,0.06)',  border: 'rgba(0,120,255,0.25)',  color: 'rgba(100,180,255,0.9)', icon: 'ℹ' },
-    warning: { bg: 'rgba(255,170,0,0.06)',  border: 'rgba(255,170,0,0.25)',  color: 'rgba(255,200,80,0.9)',  icon: '⚠' },
-    success: { bg: 'rgba(0,255,136,0.05)',  border: 'rgba(0,255,136,0.2)',   color: 'rgba(0,255,136,0.85)',  icon: '✓' },
-    danger:  { bg: 'rgba(220,38,38,0.06)',  border: 'rgba(220,38,38,0.25)',  color: 'rgba(255,100,100,0.9)', icon: '✕' },
+    info:    { bg: 'var(--color-info-subtle)',  border: 'var(--color-info)',  color: 'var(--color-info)', icon: 'ℹ' },
+    warning: { bg: 'var(--color-warning-subtle)', border: 'var(--color-warning)', color: 'var(--color-warning)', icon: '⚠' },
+    success: { bg: 'var(--accent-muted)',        border: 'var(--accent-primary)', color: 'var(--accent-primary)', icon: '✓' },
+    danger:  { bg: 'var(--color-danger-subtle)', border: 'var(--color-danger)', color: 'var(--color-danger)', icon: '✕' },
   }
   const s = styles[type] || styles.info
   return (
-    <div className="px-3 py-2.5 rounded-sm text-[10px] leading-relaxed flex gap-2"
+    <div className="px-3 py-2.5 rounded-sm leading-relaxed flex gap-2"
       style={{ background: s.bg, border: `1px solid ${s.border}`, color: s.color }}>
       <span className="flex-shrink-0 font-bold">{s.icon}</span>
       <span>{children}</span>
@@ -138,12 +139,12 @@ function StepList({ steps }) {
   return (
     <ol className="space-y-2">
       {steps.map((s, i) => (
-        <li key={i} className="flex gap-3 text-[10px]">
-          <span className="flex-shrink-0 w-5 h-5 rounded-sm flex items-center justify-center font-bold font-mono text-[9px]"
-            style={{ background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.25)', color: '#00ff88' }}>
+        <li key={i} className="flex gap-3">
+          <span className="flex-shrink-0 w-5 h-5 rounded-sm flex items-center justify-center font-bold font-mono"
+            style={{ background: 'var(--accent-muted)', border: '1px solid var(--accent-primary)', color: 'var(--accent-primary)' }}>
             {i + 1}
           </span>
-          <span className="text-[rgba(200,214,229,0.65)] leading-relaxed pt-0.5">{s}</span>
+          <span className="leading-relaxed pt-0.5" style={{ color: 'var(--text-secondary)' }}>{s}</span>
         </li>
       ))}
     </ol>
