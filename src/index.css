@@ -530,6 +530,133 @@
     text-transform: uppercase;
     color: var(--text-secondary);
   }
+
+  /* ── Spacing utilities for inline styles ─────────────── */
+  /* Use these when Tailwind classes aren't available */
+
+  /* Padding */
+  .p-section { padding: var(--space-4); }
+  .p-card    { padding: var(--space-3); }
+  .p-compact { padding: var(--space-2); }
+
+  /* Padding directional */
+  .px-section { padding-left: var(--space-4); padding-right: var(--space-4); }
+  .py-section { padding-top: var(--space-4); padding-bottom: var(--space-4); }
+  .px-card    { padding-left: var(--space-3); padding-right: var(--space-3); }
+  .py-card    { padding-top: var(--space-3); padding-bottom: var(--space-3); }
+
+  /* Gap */
+  .gap-sm    { gap: var(--space-2); }
+  .gap-md    { gap: var(--space-3); }
+  .gap-lg    { gap: var(--space-4); }
+
+  /* Margin */
+  .mb-section { margin-bottom: var(--space-4); }
+  .mb-card    { margin-bottom: var(--space-3); }
+  .mt-section { margin-top: var(--space-4); }
+
+  /* Icon-text alignment */
+  .icon-text-gap { gap: var(--space-2); align-items: center; }
+
+  /* List item spacing */
+  .list-item-padding { padding: var(--space-3) var(--space-4); }
+  .list-item-gap    { gap: var(--space-3); }
+
+  /* ── Depth & Visual Hierarchy ─────────────────────────── */
+
+  /* Card depth - subtle top inset border */
+  .depth-card {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  /* Panel elevated depth */
+  .depth-elevated {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Metric glow - active metrics */
+  .glow-metric {
+    text-shadow: 0 0 20px currentColor;
+  }
+
+  .glow-metric-strong {
+    text-shadow: 0 0 30px currentColor, 0 0 60px currentColor;
+  }
+
+  /* Header separator gradient */
+  .header-divider {
+    border-bottom: 1px solid var(--border-subtle);
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 255, 136, 0.03) 100%);
+  }
+
+  /* Active sidebar item indicator */
+  .sidebar-active-indicator {
+    border-left: 2px solid var(--accent-primary);
+    background: var(--accent-muted);
+  }
+
+  /* Table header depth */
+  .table-header-depth {
+    background: linear-gradient(180deg, var(--surface-secondary) 0%, var(--surface-primary) 100%);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  /* Status indicator glow */
+  .status-glow {
+    box-shadow: 0 0 6px currentColor;
+  }
+
+  .status-glow-pulse {
+    animation: statusGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes statusGlow {
+    0%, 100% { box-shadow: 0 0 4px currentColor; }
+    50% { box-shadow: 0 0 12px currentColor, 0 0 20px currentColor; }
+  }
+
+  /* ── Micro-interactions ──────────────────────────────── */
+
+  /* List item hover - for panels/cards used as list items */
+  .hover-lift {
+    transition: transform var(--duration-fast) var(--ease-out),
+                box-shadow var(--duration-fast) var(--ease-out);
+  }
+  .hover-lift:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Icon button scale on hover */
+  .hover-icon-scale {
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+  .hover-icon-scale:hover {
+    transform: scale(1.1);
+  }
+
+  /* Nav item active transition */
+  .nav-item {
+    transition: background-color var(--duration-fast) var(--ease-out),
+                border-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+  }
+
+  /* Button press effect */
+  .btn-press:active {
+    transform: scale(0.98);
+  }
+
+  /* Link hover underline */
+  .link-hover {
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+  .link-hover:hover {
+    color: var(--accent-primary);
+    text-decoration: underline;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════════════════════
@@ -546,6 +673,8 @@
     border-radius: var(--radius-none);
     position: relative;
     backdrop-filter: blur(4px);
+    /* Depth: subtle top inset border for 3D effect */
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   }
 
   .hud-panel::before {
@@ -585,7 +714,7 @@
     justify-content: space-between;
     padding: var(--space-2) var(--space-3);
     border-bottom: 1px solid var(--border-subtle);
-    background: var(--accent-muted);
+    background: linear-gradient(180deg, var(--accent-muted) 0%, transparent 100%);
   }
 
   .hud-title {

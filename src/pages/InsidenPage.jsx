@@ -30,7 +30,7 @@ function filterByTimeline(items, timelineId) {
 }
 
 /* ── Animation stagger helper ───────────────────────────── */
-const getStaggerDelay = (index) => Math.min(index * 20, 200)
+const getStaggerDelay = (index) => Math.min(index * 50, 300)
 
 export default function InsidenPage() {
   const navigate = useNavigate()

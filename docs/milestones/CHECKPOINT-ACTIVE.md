@@ -147,12 +147,150 @@ Utility Classes Added:
 - .metric-hero, .metric-large, .metric-medium, .metric-small
 - .body-default, .body-emphasized
 - .label-micro, .label-standard, .label-emphasis
+- .p-section, .p-card, .p-compact
+- .px-section, .py-section, .px-card, .py-card
+- .gap-sm, .gap-md, .gap-lg
+- .mb-section, .mb-card, .mt-section
+- .icon-text-gap, .list-item-padding, .list-item-gap
 
-Build: PASS (6.10s)
-CSS Size: 54.68 KB (gzip: 11.15 KB)
+Build: PASS (5.57s)
+CSS Size: 54.71 KB (gzip: 11.15 KB)
 ```
 
 **Next:** Replace all `text-[Npx]` with CSS tokens (333 occurrences in 32 files)
+
+---
+
+### KATEGORI 2: SPACING & ALIGNMENT ✅ IMPLEMENTED
+
+**Date:** 2026-06-29
+
+**Spacing Audit Results:**
+- Tailwind spacing already consistent (p-3, p-4, gap-2, gap-3, gap-4)
+- Added CSS spacing utilities for inline styles
+
+**Files Fixed:**
+- `src/pages/InsidenPage.jsx` — stagger 20ms → 50ms
+- `src/pages/KerawananPage.jsx` — stagger 20ms → 50ms
+
+**Utility Classes Added:**
+```css
+/* Padding */
+.p-section { padding: var(--space-4); }
+.p-card    { padding: var(--space-3); }
+.p-compact { padding: var(--space-2); }
+
+/* Gap */
+.gap-sm    { gap: var(--space-2); }
+.gap-md    { gap: var(--space-3); }
+.gap-lg    { gap: var(--space-4); }
+
+/* Icon-text alignment */
+.icon-text-gap { gap: var(--space-2); align-items: center; }
+
+/* List item spacing */
+.list-item-padding { padding: var(--space-3) var(--space-4); }
+.list-item-gap    { gap: var(--space-3); }
+```
+
+**Build:** PASS (6.03s)
+
+---
+
+### KATEGORI 3: DEPTH & VISUAL HIERARCHY ✅ IMPLEMENTED
+
+**Date:** 2026-06-29
+
+**Depth Improvements Added:**
+
+```css
+/* Card depth - subtle top inset border */
+.depth-card {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Panel elevated depth */
+.depth-elevated {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Metric glow effects */
+.glow-metric { text-shadow: 0 0 20px currentColor; }
+.glow-metric-strong { text-shadow: 0 0 30px currentColor, 0 0 60px currentColor; }
+
+/* Header separator gradient */
+.header-divider {
+  border-bottom: 1px solid var(--border-subtle);
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 255, 136, 0.03) 100%);
+}
+
+/* Table header depth */
+.table-header-depth {
+  background: linear-gradient(180deg, var(--surface-secondary) 0%, var(--surface-primary) 100%);
+}
+
+/* Status glow pulse */
+.status-glow-pulse { animation: statusGlow 2s ease-in-out infinite; }
+```
+
+**Core Component Updates:**
+- `.hud-panel` — Added inset shadow for 3D depth effect
+- `.hud-header` — Added gradient background for visual hierarchy
+
+**Build:** PASS (6.03s)
+CSS Size: 54.91 KB
+
+---
+
+### KATEGORI 4: MICRO-INTERACTIONS ✅ IMPLEMENTED
+
+**Date:** 2026-06-29
+
+**Micro-interaction Utilities Added:**
+
+```css
+/* List item hover lift */
+.hover-lift {
+  transition: transform var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+.hover-lift:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Icon button scale on hover */
+.hover-icon-scale {
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+.hover-icon-scale:hover {
+  transform: scale(1.1);
+}
+
+/* Nav item transitions */
+.nav-item {
+  transition: background-color var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out);
+}
+
+/* Button press effect */
+.btn-press:active { transform: scale(0.98); }
+
+/* Link hover underline */
+.link-hover { transition: color var(--duration-fast) var(--ease-out); }
+.link-hover:hover { color: var(--accent-primary); text-decoration: underline; }
+```
+
+**Existing Components Verified:**
+- Button.jsx — Has hover transitions (100ms), active scale(0.98)
+- List items in InsidenPage — Has cursor-pointer, transition-all
+- Status dots — Pulse animation with glow
+
+**Build:** PASS (8.41s)
+CSS Size: 54.91 KB
 
 ---
 

@@ -14,7 +14,7 @@ const SORT_OPTIONS = [
 ]
 
 /* ── Animation stagger helper ───────────────────────────── */
-const getStaggerDelay = (index) => Math.min(index * 20, 200)
+const getStaggerDelay = (index) => Math.min(index * 50, 300)
 
 export default function KerawananPage() {
   const navigate = useNavigate()
