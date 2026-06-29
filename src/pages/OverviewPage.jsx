@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom'
-import { PamtasMap } from '../components/map/PamtasMap'
+import { lazy, Suspense } from 'react'
 import { KerawananBadge } from '../components/ui'
+// Lazy load PamtasMap (154KB) - only loads when OverviewPage renders
+const PamtasMap = lazy(() => import('../components/map/PamtasMap').then(m => ({ default: m.PamtasMap })))
 import { usePos, useSummary, useAllKerawanan, useAllBinter, useAutoRefresh } from '../hooks/useSupabase'
 import { formatDate } from '../utils/formatDate'
 import { useApp } from '../context/AppContext'
@@ -69,13 +71,23 @@ export default function OverviewPage() {
   return (
     <div className="relative w-full h-full overflow-hidden" style={{ background: 'var(--surface-base)' }}>
 
-      {/* ══ MAP — fullscreen background ══ */}
+      {/* ══ MAP — fullscreen background (lazy loaded) ══ */}
       <div className="absolute inset-0 z-0">
-        <PamtasMap
-          posList={posList || []}
-          kerawananList={kerawanan || []}
-          height="100%"
-        />
+        <Suspense fallback={
+          <div className="w-full h-full flex items-center justify-center" style={{ background: 'var(--map-bg)' }}>
+            <div className="text-center">
+              <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin mx-auto mb-2"
+                style={{ borderColor: 'var(--accent-primary)', borderTopColor: 'transparent' }} />
+              <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>Memuat peta...</p>
+            </div>
+          </div>
+        }>
+          <PamtasMap
+            posList={posList || []}
+            kerawananList={kerawanan || []}
+            height="100%"
+          />
+        </Suspense>
       </div>
 
       {/* Grid texture overlay */}

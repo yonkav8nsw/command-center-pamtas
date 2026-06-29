@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { Component } from 'react'
+import { Component, lazy, Suspense } from 'react'
 import { AppProvider } from './context/AppContext'
 import { AuthProvider } from './context/AuthContext'
 import { ToastProvider } from './components/ui/Toast'
@@ -7,6 +7,7 @@ import { ConfirmProvider } from './components/ui/ConfirmDialog'
 import PageErrorBoundary from './components/ui/PageErrorBoundary'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { AppShell } from './components/layout/AppShell'
+import { LoadingSpinner } from './components/ui/LoadingSpinner'
 import LoginPage            from './pages/LoginPage'
 import HomePage             from './pages/HomePage'
 import OverviewPage         from './pages/OverviewPage'
@@ -15,11 +16,22 @@ import InsidenPage          from './pages/InsidenPage'
 import BinterPage           from './pages/BinterPage'
 import AdminPage            from './pages/AdminPage'
 import PanduanPage          from './pages/PanduanPage'
-import GrafikKerawananPage  from './pages/laporan/GrafikKerawananPage'
-import TimelineBinterPage   from './pages/laporan/TimelineBinterPage'
-import DataDemografiPage    from './pages/laporan/DataDemografiPage'
-import TokohWilayahPage     from './pages/laporan/TokohWilayahPage'
 import LaporanPosPage       from './pages/laporan/LaporanPosPage'
+
+// Lazy-loaded pages for code splitting (reduce initial bundle)
+const GrafikKerawananPage = lazy(() => import('./pages/laporan/GrafikKerawananPage'))
+const TimelineBinterPage  = lazy(() => import('./pages/laporan/TimelineBinterPage'))
+const DataDemografiPage    = lazy(() => import('./pages/laporan/DataDemografiPage'))
+const TokohWilayahPage    = lazy(() => import('./pages/laporan/TokohWilayahPage'))
+
+// Lazy loading fallback component
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center h-full min-h-[400px]">
+      <LoadingSpinner text="Memuat halaman..." size="lg" />
+    </div>
+  )
+}
 
 // Error boundary global
 class GlobalErrorBoundary extends Component {
@@ -115,10 +127,10 @@ export default function App() {
                           <Route path="/binter"                 element={<Safe><BinterPage /></Safe>} />
                           <Route path="/admin"                  element={<ProtectedRoute requireAdmin><Safe><AdminPage /></Safe></ProtectedRoute>} />
                           <Route path="/panduan"                element={<Safe><PanduanPage /></Safe>} />
-                          <Route path="/laporan/kerawanan"      element={<Safe><GrafikKerawananPage /></Safe>} />
-                          <Route path="/laporan/binter"         element={<Safe><TimelineBinterPage /></Safe>} />
-                          <Route path="/laporan/demografi"      element={<Safe><DataDemografiPage /></Safe>} />
-                          <Route path="/laporan/tokoh"          element={<Safe><TokohWilayahPage /></Safe>} />
+                          <Route path="/laporan/kerawanan"      element={<Safe><Suspense fallback={<PageLoader />}><GrafikKerawananPage /></Suspense></Safe>} />
+                          <Route path="/laporan/binter"         element={<Safe><Suspense fallback={<PageLoader />}><TimelineBinterPage /></Suspense></Safe>} />
+                          <Route path="/laporan/demografi"      element={<Safe><Suspense fallback={<PageLoader />}><DataDemografiPage /></Suspense></Safe>} />
+                          <Route path="/laporan/tokoh"          element={<Safe><Suspense fallback={<PageLoader />}><TokohWilayahPage /></Suspense></Safe>} />
                           <Route path="/laporan/pos/:posId"     element={<Safe><LaporanPosPage /></Safe>} />
                           <Route path="*"                       element={<Navigate to="/" replace />} />
                         </Routes>
