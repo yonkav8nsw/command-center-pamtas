@@ -10,9 +10,9 @@ export class LoginPage extends BasePage {
     this.path = '/login'
   }
 
-  // Selectors
-  get emailInput() { return this.page.locator('#email') }
-  get passwordInput() { return this.page.locator('#password') }
+  // Selectors (no id attributes in LoginPage, use type selector)
+  get emailInput() { return this.page.locator('input[type="email"]') }
+  get passwordInput() { return this.page.locator('input[type="password"]') }
   get submitButton() { return this.page.locator('button[type="submit"]') }
   get errorMessage() { return this.page.locator('[role="alert"]') }
   get loadingSpinner() { return this.page.locator('.animate-spin') }
@@ -21,8 +21,8 @@ export class LoginPage extends BasePage {
   // Actions
   async login(email, password) {
     await this.navigate(this.path)
-    await this.fill('#email', email)
-    await this.fill('#password', password)
+    await this.fill('input[type="email"]', email)
+    await this.fill('input[type="password"]', password)
     await this.click('button[type="submit"]')
   }
 
@@ -49,8 +49,8 @@ export class LoginPage extends BasePage {
 
   // Assertions
   async expectLoginForm() {
-    await this.waitForSelector('#email')
-    await this.waitForSelector('#password')
+    await this.waitForSelector('input[type="email"]')
+    await this.waitForSelector('input[type="password"]')
     await this.waitForSelector('button[type="submit"]')
   }
 

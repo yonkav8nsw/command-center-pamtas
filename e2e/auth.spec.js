@@ -31,8 +31,8 @@ test.describe('Authentication', () => {
 
   test('should show validation error for invalid email format', async () => {
     await loginPage.navigate('/login')
-    await loginPage.fill('#email', 'invalid-email')
-    await loginPage.fill('#password', 'password123')
+    await loginPage.fill('input[type="email"]', 'invalid-email')
+    await loginPage.fill('input[type="password"]', 'password123')
     await loginPage.submitButton.click()
 
     await loginPage.expectEmailValidationError()
@@ -40,8 +40,8 @@ test.describe('Authentication', () => {
 
   test('should show validation error for short password', async () => {
     await loginPage.navigate('/login')
-    await loginPage.fill('#email', 'user@test.com')
-    await loginPage.fill('#password', 'short')
+    await loginPage.fill('input[type="email"]', 'user@test.com')
+    await loginPage.fill('input[type="password"]', 'short')
     await loginPage.submitButton.click()
 
     await loginPage.expectPasswordRequiredError()
