@@ -6,8 +6,8 @@
 
 # Test info
 
-- Name: login.spec.js >> Login Page >> should display login form elements
-- Location: e2e\tests\login.spec.js:13:3
+- Name: login.spec.js >> Login Page >> should clear form fields
+- Location: e2e\tests\login.spec.js:57:3
 
 # Error details
 
