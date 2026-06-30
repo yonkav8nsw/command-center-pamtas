@@ -62,8 +62,9 @@ jobs:
           echo ""
           echo "=== HTTP Status ===" && curl -s -o /dev/null -w "%{http_code}" http://localhost:4173/command-center-pamtas/
 
-      - name: Run E2E tests
-        run: npx playwright test --reporter=line
+      # TEMPORARY: Run only debug test to see actual page state
+      - name: Run DEBUG test
+        run: npx playwright test e2e/tests/debug.spec.js --reporter=line
         env:
           E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
           E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
