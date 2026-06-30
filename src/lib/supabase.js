@@ -57,4 +57,5 @@ if (isConfigured) {
 }
 
 export { isConfigured }
+export { supabase }  // Named export for backward compatibility
 export default supabase
