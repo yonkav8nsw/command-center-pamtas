@@ -125,13 +125,13 @@ export default function PosDetailPage() {
           <div className="min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate(-1)}
                 className="text-[9px] tracking-widest uppercase transition-colors"
                 style={{ color: 'var(--accent-primary)', opacity: 0.6 }}
                 onMouseEnter={e => e.currentTarget.style.opacity = '1'}
                 onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}
               >
-                ← Overview
+                ← Kembali
               </button>
               <span className="text-xs" style={{ color: 'var(--accent-primary)', opacity: 0.3 }}>/</span>
               <span className="text-[9px] tracking-widest uppercase" style={{ color: 'var(--text-tertiary)' }}>
@@ -196,7 +196,10 @@ export default function PosDetailPage() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  setActiveTab(tab.id)
+                  navigate(`/pos/${posId}/${tab.id}`)
+                }}
                 className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold tracking-[0.12em] uppercase
                   border-b-2 whitespace-nowrap flex-shrink-0 relative transition-all duration-100"
                 style={isActive ? {
@@ -296,7 +299,7 @@ export default function PosDetailPage() {
         )}
 
         {activeTab === 'foto' && (
-          <DokumentasiTab pos={pos} />
+          <DokumentasiTab pos={pos} onRefresh={posRefresh} showToast={showToast} />
         )}
       </div>
 
@@ -426,16 +429,33 @@ function InfoPosTab({ pos, onEdit }) {
   )
 }
 
-function DokumentasiTab({ pos }) {
+function DokumentasiTab({ pos, onSave, onRefresh, showToast }) {
   const [newUrl, setNewUrl] = useState('')
   const [urlError, setUrlError] = useState('')
   const [extraUrls, setExtraUrls] = useState([])
+  const [saving, setSaving] = useState(false)
 
   const savedUrls = pos?.foto_satelit_url
     ? pos.foto_satelit_url.split(',').map(s => s.trim()).filter(Boolean)
     : []
 
   const allUrls = [...savedUrls, ...extraUrls]
+
+  async function handleSaveUrls() {
+    if (extraUrls.length === 0) return
+    setSaving(true)
+    try {
+      const newFotoUrl = [...savedUrls, ...extraUrls].join(', ')
+      await posService.update(pos.pos_id, { foto_satelit_url: newFotoUrl })
+      onRefresh?.()
+      setExtraUrls([])
+      showToast?.('URL foto berhasil disimpan', 'success')
+    } catch (err) {
+      showToast?.('Gagal menyimpan: ' + err.message, 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   function handleAddUrl() {
     const trimmed = newUrl.trim()
@@ -515,11 +535,27 @@ function DokumentasiTab({ pos }) {
         <div>
           <div className="flex items-center justify-between mb-2">
             <p className="hud-label">Dokumentasi ({allUrls.length})</p>
-            {extraUrls.length > 0 && (
-              <span className="text-[9px] italic" style={{ color: 'var(--color-warning)' }}>
-                {extraUrls.length} URL baru (belum disimpan ke sheet)
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              {extraUrls.length > 0 && (
+                <span className="text-[9px]" style={{ color: 'var(--color-warning)' }}>
+                  {extraUrls.length} URL baru
+                </span>
+              )}
+              {extraUrls.length > 0 && (
+                <button
+                  className="hud-btn text-[9px] px-2 py-1"
+                  onClick={handleSaveUrls}
+                  disabled={saving}
+                  style={{
+                    background: 'var(--color-success-subtle)',
+                    border: '1px solid var(--color-success)',
+                    color: 'var(--color-success)',
+                  }}
+                >
+                  {saving ? 'Menyimpan...' : '💾 Simpan'}
+                </button>
+              )}
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
             {allUrls.map((url, i) => (

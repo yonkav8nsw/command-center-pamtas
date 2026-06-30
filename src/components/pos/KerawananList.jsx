@@ -8,6 +8,7 @@ import { useToast } from '../ui/Toast'
 import { useConfirm } from '../ui/ConfirmDialog'
 import { kerawananService } from '../../services/kerawanan.service'
 import { clearCache } from '../../hooks/useSupabase'
+import { useRealtime } from '../../hooks/useRealtime'
 import { KERAWANAN_CATEGORIES } from '../../constants/kerawananCategories'
 
 function getCatColor(kategori) {
@@ -82,6 +83,12 @@ export function KerawananList({ kerawananList, loading, posId, onRefresh, highli
       setDeleting(null)
     }
   }
+
+  // Realtime subscription - auto-refresh when data changes
+  useRealtime('kerawanan', () => {
+    clearCache()
+    onRefresh && onRefresh()
+  }, posId ? `pos_id=eq.${posId}` : null)
 
   if (loading) return <LoadingSpinner text="Memuat data kerawanan..." />
 

@@ -3,7 +3,7 @@ import { TopBar } from './TopBar'
 import { Sidebar } from './Sidebar'
 import { StatusBar } from './StatusBar'
 
-export function AppShell({ children }) {
+export function AppShell({ children, hideStatusBar = false }) {
   const { presentationMode, togglePresentation } = useApp()
 
   return (
@@ -39,8 +39,8 @@ export function AppShell({ children }) {
         </main>
       </div>
 
-      {/* Status bar — hidden during presentation */}
-      {!presentationMode && <StatusBar />}
+      {/* Status bar — hidden during presentation and when hideStatusBar is true */}
+      {!presentationMode && !hideStatusBar && <StatusBar />}
 
       {/* ── Floating exit button during presentation mode ── */}
       {presentationMode && (

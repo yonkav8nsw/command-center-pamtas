@@ -73,12 +73,12 @@ function rect(doc, x, y, w, h, fillColor, strokeColor, lw = 0.2) {
 function drawBanner(doc) {
   // Dark green top bar
   rect(doc, 0, 0, PW, 9, C.header, null)
-  txt(doc, 'PEMERINTAH REPUBLIK INDONESIA  —  SATGAS PAMTAS RI-MLY  YONAK 8/NSW  TA 2026',
+  txt(doc, 'PEMERINTAH REPUBLIK INDONESIA  —  SATGAS PAMTAS RI-MLY  YONKAV 8/NSW  TA 2026',
     ML, 5.5, { bold: true, size: 6.5, color: C.white, align: 'center' })
 
   // Gold strip
   rect(doc, 0, 9, PW, 4, C.gold, null)
-  txt(doc, 'DOKUMEN ASLI  —  COMMAND CENTER SATGAS PAMTAS RI-MLY  YONAK 8/NSW  TA 2026',
+  txt(doc, 'DOKUMEN ASLI  —  COMMAND CENTER SATGAS PAMTAS RI-MLY  YONKAV 8/NSW  TA 2026',
     ML, 11.8, { bold: true, size: 6, color: C.header, align: 'center' })
 }
 
@@ -170,7 +170,7 @@ function drawFooter(doc) {
     doc.setPage(i)
     const y = PH - 12
     line(doc, y, C.gold, 0.5)
-    txt(doc, 'DOKUMEN ASLI COMMAND CENTER SATGAS PAMTAS RI - MLY YONAK 8/NSW TA 2026',
+    txt(doc, 'DOKUMEN ASLI COMMAND CENTER SATGAS PAMTAS RI - MLY YONKAV 8/NSW TA 2026',
       ML, y + 4, { bold: true, size: 6, color: C.gold, align: 'center' })
     txt(doc, `Generated: ${new Date().toLocaleString('id-ID')}  |  Hal. ${i} dari ${pages}`,
       ML, y + 9, { size: 6, color: C.muted, align: 'center' })

@@ -164,7 +164,7 @@ export default function OverviewPage() {
           title="⚠ ANCAMAN AKTIF"
           badge={activeKerawanan.length}
           badgeDanger
-          onMore={() => navigate('/kerawanan')}
+          onMore={() => navigate('/insiden')}
         >
           <div className="space-y-2 max-h-48 overflow-y-auto pr-0.5 scrollbar-thin">
             {activeKerawanan.length === 0 ? (
@@ -182,12 +182,12 @@ export default function OverviewPage() {
                   key={item.id}
                   item={item}
                   posName={posNameMap[item.pos_id]}
-                  onClick={() => navigate('/kerawanan')}
+                  onClick={() => navigate('/insiden')}
                 />
               ))
             )}
             {activeKerawanan.length > 6 && (
-              <button onClick={() => navigate('/kerawanan')}
+              <button onClick={() => navigate('/insiden')}
                 className="w-full text-[9px] py-1.5 tracking-wider uppercase font-semibold transition-all"
                 style={{ color: 'var(--color-danger)' }}
                 onMouseEnter={e => {

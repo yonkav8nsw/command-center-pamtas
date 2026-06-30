@@ -19,7 +19,7 @@ import { exportToPDF } from '../../utils/exportPDF'
  * - Action buttons (presentation, fullscreen, print, logout)
  */
 
-export function TopBar() {
+export function TopBar({ minimal = false }) {
   const { toggleSidebar, togglePresentation, presentationMode, sidebarOpen } = useApp()
   const { profile, signOut } = useAuth()
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -39,6 +39,34 @@ export function TopBar() {
   const tgl = currentTime.toLocaleDateString('id-ID', { day: '2-digit' })
   const bulan = currentTime.toLocaleDateString('id-ID', { month: 'long' }).toUpperCase()
   const tahun = currentTime.getFullYear()
+
+  // Minimal mode: only hamburger, transparent background
+  if (minimal) {
+    return (
+      <header
+        className="relative flex items-center h-12 px-3 flex-shrink-0 z-20"
+        style={{
+          background: 'transparent',
+        }}
+      >
+        {/* Sidebar toggle only */}
+        <TopBarButton
+          onClick={toggleSidebar}
+          title={sidebarOpen ? 'Tutup Sidebar' : 'Buka Sidebar'}
+          variant="ghost"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </TopBarButton>
+      </header>
+    )
+  }
 
   return (
     <header

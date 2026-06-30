@@ -4,16 +4,20 @@ import { FormField, FormActions, FormError } from './TokohForm'
 
 export function KerawananForm({ posId, onSave, onCancel }) {
   const today = new Date().toISOString().slice(0, 10)
+  const now = new Date().toTimeString().slice(0, 5)
   const [form, setForm] = useState({
-    tanggal:       today,
-    kategori:      '',
-    deskripsi:     '',
-    pelaku:        '',
-    tindak_lanjut: '',
-    status:        'aktif',
-    lat:           '',
-    lng:           '',
-    foto_url:      '',
+    tanggal:        today,
+    waktu:          now,
+    kategori:       '',
+    deskripsi:      '',
+    lokasi:         '',
+    pelaku:         '',
+    jumlah_pelaku:  '',
+    tindak_lanjut:  '',
+    status:         'aktif',
+    lat:            '',
+    lng:            '',
+    foto_url:       '',
   })
   const [saving, setSaving] = useState(false)
   const [fieldError, setFieldError] = useState('')
@@ -33,6 +37,10 @@ export function KerawananForm({ posId, onSave, onCancel }) {
       setFieldError('Deskripsi tidak boleh kosong')
       return
     }
+    if (!form.lokasi.trim()) {
+      setFieldError('Lokasi kejadian wajib diisi')
+      return
+    }
     setSaving(true)
     setFieldError('')
     try {
@@ -46,7 +54,7 @@ export function KerawananForm({ posId, onSave, onCancel }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
 
         <FormField label="Tanggal *">
           <input
@@ -54,6 +62,16 @@ export function KerawananForm({ posId, onSave, onCancel }) {
             className="hud-input"
             value={form.tanggal}
             onChange={set('tanggal')}
+            required
+          />
+        </FormField>
+
+        <FormField label="Waktu *">
+          <input
+            type="time"
+            className="hud-input"
+            value={form.waktu}
+            onChange={set('waktu')}
             required
           />
         </FormField>
@@ -72,7 +90,17 @@ export function KerawananForm({ posId, onSave, onCancel }) {
           </select>
         </FormField>
 
-        <FormField label="Deskripsi Kejadian *" colSpan={2}>
+        <FormField label="Lokasi Kejadian *" colSpan={3}>
+          <input
+            className="hud-input"
+            value={form.lokasi}
+            onChange={set('lokasi')}
+            placeholder="Desa/Kecamatan/Kabupaten lokasi kejadian"
+            required
+          />
+        </FormField>
+
+        <FormField label="Deskripsi Kejadian *" colSpan={3}>
           <textarea
             className="hud-input resize-none"
             rows={3}
@@ -83,16 +111,27 @@ export function KerawananForm({ posId, onSave, onCancel }) {
           />
         </FormField>
 
-        <FormField label="Pelaku / Pihak Terlibat" colSpan={2}>
+        <FormField label="Identitas Pelaku" colSpan={2}>
           <input
             className="hud-input"
             value={form.pelaku}
             onChange={set('pelaku')}
-            placeholder="Identitas pelaku (jika diketahui)"
+            placeholder="Nama/ciri-ciri pelaku (jika diketahui)"
           />
         </FormField>
 
-        <FormField label="Tindak Lanjut" colSpan={2}>
+        <FormField label="Jumlah Pelaku">
+          <input
+            type="number"
+            min="1"
+            className="hud-input"
+            value={form.jumlah_pelaku}
+            onChange={set('jumlah_pelaku')}
+            placeholder="0"
+          />
+        </FormField>
+
+        <FormField label="Tindak Lanjut" colSpan={3}>
           <textarea
             className="hud-input resize-none"
             rows={2}
@@ -118,7 +157,6 @@ export function KerawananForm({ posId, onSave, onCancel }) {
           />
         </FormField>
 
-        {/* Koordinat */}
         <FormField label="Latitude">
           <input
             type="number"
@@ -160,4 +198,3 @@ export function KerawananForm({ posId, onSave, onCancel }) {
     </form>
   )
 }
-

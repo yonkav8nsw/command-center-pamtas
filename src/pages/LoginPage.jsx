@@ -203,7 +203,8 @@ const BOOT_LINES = [
   { delay: 1000, text: '[OK] Map engine loaded', color: 'rgba(0,255,136,0.45)' },
   { delay: 1300, text: '[OK] Supabase realtime connected', color: 'rgba(0,255,136,0.45)' },
   { delay: 1600, text: '[OK] RLS policies active', color: 'rgba(0,255,136,0.45)' },
-  { delay: 2000, text: 'Awaiting operator authentication...', color: 'rgba(255,170,0,0.6)' },
+  { delay: 2000, text: 'NARASINGA OPERATION CENTER :: READY', color: 'rgba(0,255,136,0.6)' },
+  { delay: 2300, text: 'Awaiting operator authentication...', color: 'rgba(255,170,0,0.6)' },
 ]
 
 function TerminalLog() {
@@ -262,7 +263,7 @@ export default function LoginPage() {
   const [error,    setError]    = useState(null)
   const [loading,  setLoading]  = useState(false)
 
-  const { displayed, done } = useTypewriter('SATGAS PAMTAS RI-MLY', 70, 800)
+  const { displayed, done } = useTypewriter('NARASINGA OPERATION CENTER', 70, 800)
 
   useEffect(() => { injectGlitchStyles() }, [])
 
@@ -365,17 +366,55 @@ export default function LoginPage() {
         {/* ── Header ── */}
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
 
-          {/* Badge */}
+          {/* Badge - Enhanced NARASINGA OPERATION CENTER */}
           <div style={{
             display: 'inline-block',
-            padding: '6px 18px',
-            border: '1px solid rgba(0,255,136,0.22)',
-            marginBottom: '18px',
+            padding: '8px 24px',
+            marginBottom: '20px',
+            background: 'rgba(0,255,136,0.08)',
+            border: '1px solid rgba(0,255,136,0.35)',
+            borderRadius: '2px',
+            position: 'relative',
             animation: 'badge-pulse 3s ease-in-out infinite',
-            background: 'rgba(0,255,136,0.05)',
+            boxShadow: '0 0 20px rgba(0,255,136,0.15), inset 0 0 20px rgba(0,255,136,0.05)',
           }}>
-            <span style={{ color: '#00ff88', fontSize: '9px', letterSpacing: '0.28em' }}>
-              ◈ NARASINGA OPS CENTER
+            {/* Corner accents */}
+            <div style={{
+              position: 'absolute',
+              top: '-1px', left: '-1px',
+              width: '8px', height: '8px',
+              borderTop: '2px solid #00ff88',
+              borderLeft: '2px solid #00ff88',
+            }} />
+            <div style={{
+              position: 'absolute',
+              top: '-1px', right: '-1px',
+              width: '8px', height: '8px',
+              borderTop: '2px solid #00ff88',
+              borderRight: '2px solid #00ff88',
+            }} />
+            <div style={{
+              position: 'absolute',
+              bottom: '-1px', left: '-1px',
+              width: '8px', height: '8px',
+              borderBottom: '2px solid #00ff88',
+              borderLeft: '2px solid #00ff88',
+            }} />
+            <div style={{
+              position: 'absolute',
+              bottom: '-1px', right: '-1px',
+              width: '8px', height: '8px',
+              borderBottom: '2px solid #00ff88',
+              borderRight: '2px solid #00ff88',
+            }} />
+            <span style={{
+              color: '#00ff88',
+              fontSize: '11px',
+              fontWeight: 600,
+              letterSpacing: '0.25em',
+              textShadow: '0 0 10px rgba(0,255,136,0.5), 0 0 20px rgba(0,255,136,0.3)',
+            }}>
+              ◈ NARASINGA OPERATION CENTER
             </span>
           </div>
 
@@ -388,7 +427,7 @@ export default function LoginPage() {
             minHeight: '26px',
           }}>
             {done ? (
-              <GlitchText text="SATGAS PAMTAS RI-MLY" style={{ color: 'rgba(200,214,229,0.92)' }} />
+              <GlitchText text="NARASINGA OPERATION CENTER" style={{ color: 'rgba(200,214,229,0.92)', fontSize: '14px', letterSpacing: '0.18em' }} />
             ) : (
               <span style={{ color: 'rgba(200,214,229,0.92)' }}>
                 {displayed}
