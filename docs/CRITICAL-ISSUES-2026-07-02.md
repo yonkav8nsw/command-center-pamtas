@@ -38,40 +38,47 @@ Tests redirect to login page = authentication failed
 
 ## ACTION ITEMS
 
-### 1. Create Test User in Supabase
+### 1. Create Test User via Supabase Dashboard
 ```
 1. Go to: https://supabase.com/dashboard
 2. Select project
 3. Go to Authentication > Users
-4. Click "Add user"
-5. Create user with credentials matching E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD
+4. Click "Add user" / "Create user"
+5. Create user with:
+   - Email: any valid email you control
+   - Password: a strong password
+6. Copy the credentials
 ```
 
-### 2. Verify Environment Variables in CI
-Ensure these are set in GitHub Secrets:
-- `E2E_ADMIN_EMAIL` - valid Supabase user email
-- `E2E_ADMIN_PASSWORD` - valid Supabase user password
+### 2. Update GitHub Secrets
+```
+1. Go to: https://github.com/yonkav8nsw/command-center-pamtas/settings/secrets/actions
+2. Edit E2E_ADMIN_EMAIL → your test user's email
+3. Edit E2E_ADMIN_PASSWORD → your test user's password
+```
 
-### 3. Alternative: Use Real Credentials
-If test@pamtas.mil.id doesn't exist, create it in Supabase or use an existing admin account.
+### 3. Alternative: Use Service Role Key (Programmatic)
+If you have the service role key from Supabase > Settings > API:
+```bash
+SUPABASE_SERVICE_ROLE_KEY=your-key node scripts/create-test-user.js
+```
 
 ---
 
-## FILES TO UPDATE
+## FILES CREATED
 
-Once credentials are fixed:
-- No code changes needed - tests should pass automatically
+- `scripts/create-test-user.js` - Script to programmatically create test user
 
 ---
 
 ## TEST COMMANDS
 
 ```bash
-# Run all tests
+# Run all tests (after credentials configured)
 npm run test:e2e
 
-# Run with credentials
-E2E_ADMIN_EMAIL="real@email.com" E2E_ADMIN_PASSWORD="realpass" npm run test:e2e
+# Run with inline credentials
+E2E_ADMIN_EMAIL="test@example.com" E2E_ADMIN_PASSWORD="pass123" npm run test:e2e
 
 # Run specific test
 npm run test:e2e -- --grep "Admin"
