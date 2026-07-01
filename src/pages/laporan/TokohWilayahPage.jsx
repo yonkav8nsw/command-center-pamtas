@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { usePos, useAllTokoh } from '../../hooks/useSupabase'
-import { LoadingSpinner, EmptyState } from '../../components/ui'
+import { LoadingSpinner, EmptyState, Modal } from '../../components/ui'
+import { TokohForm } from '../../components/forms/TokohForm'
+import { tokohService } from '../../services/tokoh.service'
 
 /* ── Animation stagger helper ───────────────────────────── */
 const getStaggerDelay = (index) => Math.min(index * 50, 300)
@@ -27,11 +29,12 @@ const KATEGORI_COLOR = {
 
 export default function TokohWilayahPage() {
   const { data: posList, loading: posLoading } = usePos()
-  const { data: tokohData, loading: tokohLoading } = useAllTokoh()
+  const { data: tokohData, loading: tokohLoading, refetch: refetchTokoh } = useAllTokoh()
   const [filterPos,      setFilterPos]      = useState('all')
   const [filterKategori, setFilterKategori] = useState('all')
   const [search,         setSearch]         = useState('')
   const [selectedTokoh,  setSelectedTokoh]  = useState(null)
+  const [editingTokoh,   setEditingTokoh]   = useState(null)
 
   const loading = posLoading || tokohLoading
   const allTokoh = (tokohData || []).map(t => ({
@@ -126,7 +129,7 @@ export default function TokohWilayahPage() {
           >
             <option value="all">Semua Pos</option>
             {(posList || []).map(p => (
-              <option key={p.pos_id} value={p.pos_id}>{p.pos_id}</option>
+              <option key={p.pos_id} value={p.pos_id}>{p.nama_pos || p.pos_id}</option>
             ))}
           </select>
 
@@ -193,8 +196,34 @@ export default function TokohWilayahPage() {
           tokoh={selectedTokoh}
           posName={posNameMap[selectedTokoh.pos_id] || selectedTokoh.pos_id}
           onClose={() => setSelectedTokoh(null)}
+          onEdit={() => {
+            setEditingTokoh(selectedTokoh)
+            setSelectedTokoh(null)
+          }}
         />
       )}
+
+      {/* Modal Edit Tokoh */}
+      <Modal
+        isOpen={!!editingTokoh}
+        onClose={() => setEditingTokoh(null)}
+        title={editingTokoh ? 'Edit Tokoh' : 'Tambah Tokoh'}
+        size="md"
+      >
+        {editingTokoh && (
+          <TokohForm
+            initialData={editingTokoh}
+            posId={editingTokoh.pos_id}
+            posNama={posNameMap[editingTokoh.pos_id] || editingTokoh.pos_id}
+            onSave={async (formData) => {
+              await tokohService.update(editingTokoh.id, formData)
+              await refetchTokoh()
+              setEditingTokoh(null)
+            }}
+            onCancel={() => setEditingTokoh(null)}
+          />
+        )}
+      </Modal>
     </div>
   )
 }
@@ -306,14 +335,26 @@ function TokohBiografiModal({ tokoh, posName, onClose }) {
             </span>
             <span className="font-mono text-[9px]" style={{ color: 'var(--text-tertiary)' }}>{posName}</span>
           </div>
-          <button
-            onClick={onClose}
-            className="text-lg leading-none transition-all p-1 rounded-sm"
-            style={{ color: 'var(--text-tertiary)' }}
-            onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'}
-            onMouseLeave={e => e.currentTarget.style.color = 'var(--text-tertiary)'}
-            aria-label="Tutup modal"
-          >×</button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={onEdit}
+              className="text-xs px-2 py-1 rounded-sm transition-all"
+              style={{ color: 'var(--accent-primary)', background: 'var(--accent-muted)', border: '1px solid var(--accent-primary)' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent-primary)'; e.currentTarget.style.color = '#000' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'var(--accent-muted)'; e.currentTarget.style.color = 'var(--accent-primary)' }}
+              aria-label="Edit tokoh"
+            >
+              Edit
+            </button>
+            <button
+              onClick={onClose}
+              className="text-lg leading-none transition-all p-1 rounded-sm"
+              style={{ color: 'var(--text-tertiary)' }}
+              onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'}
+              onMouseLeave={e => e.currentTarget.style.color = 'var(--text-tertiary)'}
+              aria-label="Tutup modal"
+            >×</button>
+          </div>
         </div>
 
         {/* Body */}

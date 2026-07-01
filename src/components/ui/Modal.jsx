@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 
 /**
  * Modal Component - Feedback Component
@@ -15,6 +15,7 @@ import { useEffect, useRef, useState } from 'react'
  * - Click outside to close
  * - Multiple sizes
  * - Full ARIA support
+ * - Flexbox layout for proper scroll
  */
 
 const SIZE_MAP = {
@@ -37,35 +38,46 @@ export function Modal({
   footer,
   className = '',
 }) {
-  const [isVisible, setIsVisible] = useState(false)
+  // isOpen is the SINGLE source of truth for rendering
+  // Exit animation is triggered when isOpen becomes false
   const [isExiting, setIsExiting] = useState(false)
   const overlayRef = useRef(null)
   const contentRef = useRef(null)
   const previousFocusRef = useRef(null)
 
-  // Handle open/close animations
+  // Handle open/close transitions
   useEffect(() => {
     if (isOpen) {
+      // Modal is opening
       previousFocusRef.current = document.activeElement
-      setIsVisible(true)
       document.body.style.overflow = 'hidden'
+      setIsExiting(false)
     } else {
-      document.body.style.overflow = ''
-    }
-
-    return () => {
-      document.body.style.overflow = ''
+      // Modal is closing - trigger exit animation
+      if (isExiting) {
+        // Already in exit animation, wait for it to complete
+      } else {
+        // Start exit animation
+        setIsExiting(true)
+      }
     }
   }, [isOpen])
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [])
+
   // Handle escape key and focus trap
   useEffect(() => {
-    if (!isOpen || !isVisible) return
+    if (!isOpen || isExiting) return
 
     const handleKeyDown = (e) => {
       // ESC to close
       if (e.key === 'Escape' && closeOnEscape) {
-        handleClose()
+        onClose?.()
         return
       }
 
@@ -104,24 +116,28 @@ export function Modal({
       clearTimeout(timer)
       previousFocusRef.current?.focus?.()
     }
-  }, [isOpen, isVisible, closeOnEscape])
+  }, [isOpen, isExiting, closeOnEscape, onClose])
 
-  const handleClose = () => {
-    setIsExiting(true)
-    setTimeout(() => {
-      setIsExiting(false)
-      setIsVisible(false)
-      onClose?.()
-    }, 150) // Wait for exit animation
-  }
+  // Cleanup when animation completes
+  useEffect(() => {
+    if (isExiting && !isOpen) {
+      // Exit animation complete, unmount
+      const timer = setTimeout(() => {
+        document.body.style.overflow = ''
+        previousFocusRef.current?.focus?.()
+      }, 150)
+      return () => clearTimeout(timer)
+    }
+  }, [isExiting, isOpen])
 
   const handleOverlayClick = (e) => {
     if (closeOnOverlay && e.target === overlayRef.current) {
-      handleClose()
+      onClose?.()
     }
   }
 
-  if (!isVisible && !isOpen) return null
+  // Don't render if not open and not in exit animation
+  if (!isOpen && !isExiting) return null
 
   return (
     <div
@@ -141,15 +157,18 @@ export function Modal({
       role="dialog"
       aria-labelledby={title ? 'modal-title' : undefined}
     >
+      {/* Flex container for proper scroll layout */}
       <div
         ref={contentRef}
         tabIndex={-1}
         className={`
           ${SIZE_MAP[size] || SIZE_MAP.md}
           w-full
+          h-full max-h-[calc(100vh-2rem)]
           rounded-sm
+          flex flex-col
           transition-all duration-150
-          ${isExiting ? 'scale-95 opacity-0' : 'scale-100 opacity-100 animate-scale-in'}
+          ${isExiting ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}
           ${className}
         `}
         style={{
@@ -157,12 +176,11 @@ export function Modal({
           border: '1px solid var(--border-default)',
           boxShadow: 'var(--shadow-xl)',
           transitionTimingFunction: isExiting ? 'var(--ease-sharp)' : 'var(--ease-out)',
-          maxHeight: 'calc(100vh - 2rem)',
         }}
       >
-        {/* Header */}
+        {/* Header - Fixed height, won't shrink */}
         <div
-          className="flex items-center justify-between px-4 py-3"
+          className="flex-shrink-0 flex items-center justify-between px-4 py-3"
           style={{
             borderBottom: '1px solid var(--border-subtle)',
             backgroundColor: 'var(--accent-muted)',
@@ -177,7 +195,7 @@ export function Modal({
           </h2>
           {showClose && (
             <button
-              onClick={handleClose}
+              onClick={onClose}
               aria-label="Tutup modal"
               className="p-1.5 rounded-sm transition-colors duration-100"
               style={{ color: 'var(--text-tertiary)' }}
@@ -191,18 +209,17 @@ export function Modal({
           )}
         </div>
 
-        {/* Content */}
+        {/* Content - Flexible height, scrollable */}
         <div
-          className="px-4 py-4 overflow-y-auto"
-          style={{ maxHeight: footer ? 'calc(100% - 130px)' : 'calc(100% - 60px)' }}
+          className="flex-1 min-h-0 overflow-y-auto px-4 py-4"
         >
           {children}
         </div>
 
-        {/* Footer */}
+        {/* Footer - Fixed height, won't shrink */}
         {footer && (
           <div
-            className="flex items-center justify-end gap-2 px-4 py-3"
+            className="flex-shrink-0 flex items-center justify-end gap-2 px-4 py-3"
             style={{ borderTop: '1px solid var(--border-subtle)' }}
           >
             {footer}

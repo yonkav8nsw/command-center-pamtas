@@ -226,7 +226,7 @@ export default function OverviewPage() {
       </div>
 
       {/* ══ RIGHT PANEL ══ */}
-      <div className="absolute right-2 z-[10] w-52 flex flex-col gap-2 animate-slide-in-right" style={{ top: 'calc(8px + 72px + 20px)' }}>
+      <div className="absolute right-2 z-[10] w-52 flex flex-col gap-2 animate-slide-in-right" style={{ top: 'calc(8px + 72px + 20px)', bottom: '36px' }}>
 
         {/* Status Personel */}
         <OverlayPanel title="◆ STATUS PERSONEL" onMore={() => navigate('/laporan/demografi')}>
@@ -358,9 +358,9 @@ function ThreatCard({ item, posName, onClick }) {
           <KerawananBadge kategori={item.kategori} />
           <span className="text-[8px] font-bold tracking-wide flex-shrink-0 px-1.5 py-0.5 rounded-sm"
             style={{
-              color: 'var(--color-danger-text)',
+              color: '#ffffff',
               background: 'var(--color-danger)',
-              opacity: 0.9,
+              boxShadow: '0 0 8px rgba(255,59,59,0.4)',
             }}>
             {posName
               ? posName.replace(/^Pos /i, 'POS ').toUpperCase()

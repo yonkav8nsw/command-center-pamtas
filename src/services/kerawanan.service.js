@@ -30,9 +30,17 @@ export const kerawananService = {
 
   async add(payload) {
     const { data: { user } } = await supabase.auth.getUser()
+    // Sanitize numeric fields - convert empty strings to null
+    const sanitized = {
+      ...payload,
+      lat: payload.lat === '' || payload.lat == null ? null : Number(payload.lat),
+      lng: payload.lng === '' || payload.lng == null ? null : Number(payload.lng),
+      jumlah_pelaku: payload.jumlah_pelaku === '' || payload.jumlah_pelaku == null ? null : Number(payload.jumlah_pelaku),
+      created_by: user?.id,
+    }
     const { data, error } = await supabase
       .from('kerawanan')
-      .insert({ ...payload, created_by: user?.id })
+      .insert(sanitized)
       .select()
       .single()
     if (error) throw error
@@ -41,9 +49,17 @@ export const kerawananService = {
 
   async update(id, payload) {
     const { data: { user } } = await supabase.auth.getUser()
+    // Sanitize numeric fields - convert empty strings to null
+    const sanitized = {
+      ...payload,
+      lat: payload.lat === '' || payload.lat == null ? null : Number(payload.lat),
+      lng: payload.lng === '' || payload.lng == null ? null : Number(payload.lng),
+      jumlah_pelaku: payload.jumlah_pelaku === '' || payload.jumlah_pelaku == null ? null : Number(payload.jumlah_pelaku),
+      updated_by: user?.id,
+    }
     const { data, error } = await supabase
       .from('kerawanan')
-      .update({ ...payload, updated_by: user?.id })
+      .update(sanitized)
       .eq('id', id)
       .select()
       .single()

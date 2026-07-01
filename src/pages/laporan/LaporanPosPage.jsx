@@ -45,9 +45,9 @@ export default function LaporanPosPage() {
   }
 
   return (
-    <>
+    <div className="h-full flex flex-col overflow-hidden">
       {/* ── Tombol aksi (tidak ikut print) ─── */}
-      <div className="print:hidden flex items-center gap-3 px-4 py-3"
+      <div className="print:hidden flex-shrink-0 flex items-center gap-3 px-4 py-3"
         style={{ background: 'var(--surface-primary)', borderBottom: '1px solid var(--border-subtle)' }}>
         <button
           onClick={() => navigate(`/pos/${posId}`)}
@@ -69,10 +69,11 @@ export default function LaporanPosPage() {
         </button>
       </div>
 
-      {/* ── Konten laporan ─────────────────── */}
-      <div
-        id="laporan-pos"
-        className="p-6 max-w-4xl mx-auto space-y-6 print:p-4 print:space-y-4"
+      {/* ── Konten laporan (scrollable) ─── */}
+      <div className="flex-1 overflow-y-auto">
+        <div
+          id="laporan-pos"
+          className="p-6 max-w-4xl mx-auto space-y-6 print:p-4 print:space-y-4"
         style={{ fontFamily: 'monospace', background: 'var(--surface-base)', color: 'var(--text-primary)' }}
       >
         {/* Header */}
@@ -301,8 +302,9 @@ export default function LaporanPosPage() {
             {APP_CONFIG.SATGAS_NAME} · {APP_CONFIG.YONKAV} · {APP_CONFIG.WILAYAH} · {APP_CONFIG.TAHUN_ANGGARAN}
           </p>
         </div>
+        </div>
       </div>
-    </>
+    </div>
   )
 }
 

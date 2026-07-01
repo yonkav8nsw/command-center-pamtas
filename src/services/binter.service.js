@@ -35,9 +35,15 @@ export const binterService = {
 
   async add(payload) {
     const { data: { user } } = await supabase.auth.getUser()
+    // Sanitize numeric fields - convert empty strings to null
+    const sanitized = {
+      ...payload,
+      jumlah_peserta: payload.jumlah_peserta === '' || payload.jumlah_peserta == null ? null : Number(payload.jumlah_peserta),
+      created_by: user?.id,
+    }
     const { data, error } = await supabase
       .from('binter')
-      .insert({ ...payload, created_by: user?.id })
+      .insert(sanitized)
       .select()
       .single()
     if (error) throw error
@@ -46,9 +52,15 @@ export const binterService = {
 
   async update(id, payload) {
     const { data: { user } } = await supabase.auth.getUser()
+    // Sanitize numeric fields - convert empty strings to null
+    const sanitized = {
+      ...payload,
+      jumlah_peserta: payload.jumlah_peserta === '' || payload.jumlah_peserta == null ? null : Number(payload.jumlah_peserta),
+      updated_by: user?.id,
+    }
     const { data, error } = await supabase
       .from('binter')
-      .update({ ...payload, updated_by: user?.id })
+      .update(sanitized)
       .eq('id', id)
       .select()
       .single()
