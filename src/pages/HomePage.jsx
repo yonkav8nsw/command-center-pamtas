@@ -1,18 +1,28 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { motion, useReducedMotion } from 'motion/react'
 import { useAuth } from '../context/AuthContext'
 import { useAllKerawanan, usePos, useSummary } from '../hooks/useSupabase'
+import { StatChip, StatusDot } from '../components/ui'
 
 /**
- * HomePage — Premium Tactical Command Center Hero (v2)
+ * HomePage — Premium Tactical Command Center Hero
  *
- * New Design:
- * - No hero figure (removed)
- * - 2-row indicator panel:
- *   Row 1: Personel - Pos Aktif - Insiden
- *   Row 2: Overview - Insiden - Laporan
- * - Panel positioned at: left:166.27px, bottom:275.42px
- * - Logo positioned at: left:313.16px, top:109.56px, width:309.05px, height:293.51px
+ * Design System Foundation v2.0
+ * Motion Bible Compliance:
+ * - Banner entrance: 800ms ease-out
+ * - Stagger animations: 100ms increments
+ * - Scanline: 4s linear infinite
+ * - Glow pulse: 2s ease-in-out infinite
+ * - Particles: slow float animation
+ *
+ * Features:
+ * - Full-screen hero banner (HD, no blur)
+ * - NARASINGA SIAGA / PERBATASAN TERJAGA motto with motion animations
+ * - Logo with cinematic entrance and floating idle animation
+ * - Minimal UI - only hamburger menu visible
+ * - Bottom-left panel row with dark backdrop
+ * - Animated HUD effects
  */
 
 export default function HomePage() {
@@ -21,6 +31,7 @@ export default function HomePage() {
   const { data: kerawanan } = useAllKerawanan()
   const { data: posList } = usePos()
   const { data: summary } = useSummary()
+  const prefersReducedMotion = useReducedMotion()
 
   const [loaded, setLoaded] = useState(false)
 
@@ -34,17 +45,53 @@ export default function HomePage() {
     return () => clearTimeout(timer)
   }, [])
 
+  // Motion animation variants
+  const shouldAnimate = !prefersReducedMotion
+
+  const textVariants = {
+    line1: {
+      hidden: { opacity: 0, x: 60, filter: 'blur(8px)' },
+      visible: { opacity: 1, x: 0, filter: 'blur(0px)', transition: { duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] } }
+    },
+    line2: {
+      hidden: { opacity: 0, x: 60, filter: 'blur(8px)' },
+      visible: { opacity: 1, x: 0, filter: 'blur(0px)', transition: { duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] } }
+    },
+    line3: {
+      hidden: { opacity: 0, x: 60, filter: 'blur(8px)' },
+      visible: { opacity: 1, x: 0, filter: 'blur(0px)', transition: { duration: 0.9, delay: 0.7, ease: [0.16, 1, 0.3, 1] } }
+    },
+    subtitle: {
+      hidden: { opacity: 0, y: 12 },
+      visible: { opacity: 1, y: 0, transition: { duration: 0.8, delay: 1.0, ease: 'easeOut' } }
+    }
+  }
+
+  const logoVariants = {
+    hidden: { opacity: 0, scale: 0.7, rotate: -8 },
+    visible: { opacity: 1, scale: 1, rotate: 0, transition: { duration: 1.2, delay: 0.8, ease: [0.16, 1, 0.3, 1] } },
+    float: {
+      y: [0, -8, 0],
+      filter: [
+        'drop-shadow(0 0 8px rgba(0,255,136,0.3)',
+        'drop-shadow(0 0 18px rgba(0,255,136,0.6)',
+        'drop-shadow(0 0 8px rgba(0,255,136,0.3)'
+      ],
+      transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' }
+    }
+  }
+
   return (
     <div
       className="h-full overflow-hidden relative"
       style={{ background: '#050810' }}
     >
-      {/* HERO BANNER (HD, No Blur) - Without hero figure */}
+      {/* HERO BANNER (HD, No Blur) */}
       <div
         className="absolute inset-0 transition-all duration-[800ms]"
         style={{
-          opacity: loaded ? 1 : 0,
-          transform: loaded ? 'scale(1)' : 'scale(1.02)',
+          opacity: prefersReducedMotion ? 1 : (loaded ? 1 : 0),
+          transform: prefersReducedMotion ? 'scale(1)' : (loaded ? 'scale(1)' : 'scale(1.02)'),
         }}
       >
         {/* Banner Background - HD Quality */}
@@ -79,90 +126,232 @@ export default function HomePage() {
             backgroundSize: '60px 60px',
           }}
         />
+
+        {/* HERO FIGURE - Person Photo Overlay */}
+        <div
+          className="absolute transition-all duration-[1000ms]"
+          style={{
+            left: '5.98%',
+            width: '35.13%',
+            top: '4.70%',
+            bottom: 0,
+            zIndex: 7,
+            opacity: prefersReducedMotion ? 1 : (loaded ? 1 : 0),
+            transform: prefersReducedMotion ? 'translateY(0)' : (loaded ? 'translateY(0)' : 'translateY(20px)'),
+            transitionDelay: '200ms',
+          }}
+        >
+          <img
+            src={`${import.meta.env.BASE_URL}hero-figure.png`}
+            alt=""
+            className="w-full h-auto object-contain object-bottom"
+            style={{
+              filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.5)) drop-shadow(0 0 25px rgba(0,255,136,0.15))',
+              maxHeight: '95vh',
+            }}
+            onError={(e) => { e.target.style.display = 'none' }}
+          />
+        </div>
       </div>
+
+      {/* SCANLINE EFFECT */}
+      <div className="scanline-overlay" aria-hidden="true" />
+
+      {/* FLOATING PARTICLES */}
+      <Particles count={15} />
 
       {/* GLOW BORDER */}
       <div className="glow-border" aria-hidden="true" />
 
-      {/* MAIN CONTENT */}
+      {/* MAIN CONTENT (NO HEADER, NO FOOTER) */}
       <div className="relative z-10 h-full">
         {/* Space for hamburger menu only */}
         <div className="h-12 flex-shrink-0" />
 
-        {/* Logo - Positioned at left:313.16px, top:109.56px, width:309.05px, height:293.51px */}
-        <img
-          src={`${import.meta.env.BASE_URL}logo.png?v=${Date.now()}`}
-          alt="Logo"
-          className="absolute"
-          style={{
-            left: '313.16px',
-            top: '109.56px',
-            width: '309.05px',
-            height: '293.51px',
-            objectFit: 'contain',
-            zIndex: 10,
-            opacity: loaded ? 1 : 0,
-            transition: 'opacity 0.8s ease-out',
-          }}
-        />
-
-        {/* INDICATOR PANEL - 2 rows layout */}
-        {/* Position: left:166.27px, bottom:275.42px, width:602.82px */}
+        {/* Motto Text - Positioned absolutely */}
         <div
-          className="absolute flex flex-col gap-3 transition-all duration-[800ms]"
+          className="absolute text-right"
           style={{
-            left: '166.27px',
-            bottom: '275.42px',
-            width: '602.82px',
-            zIndex: 15,
-            opacity: loaded ? 1 : 0,
-            transform: loaded ? 'translateY(0)' : 'translateY(20px)',
-            transitionDelay: '300ms',
+            left: '45.72%',
+            bottom: '17.43%',
+            zIndex: 10,
           }}
         >
-          {/* Row 1: Personel - Pos Aktif - Insiden */}
-          <div className="flex gap-3">
-            <StatCard
+          {/* Motto Line 1 - NARASINGA SIAGA */}
+          {shouldAnimate ? (
+            <motion.h1
+              variants={textVariants.line1}
+              initial="hidden"
+              animate="visible"
+              className="glitch-text text-4xl md:text-6xl tracking-[0.1em] uppercase leading-none"
+              style={{
+                fontFamily: "'Russo One', sans-serif",
+                color: 'var(--accent-primary)',
+                textShadow: '0 0 35px rgba(0,255,136,0.6), 0 0 70px rgba(0,255,136,0.3)',
+              }}
+            >
+              NARASINGA SIAGA
+            </motion.h1>
+          ) : (
+            <h1
+              className="glitch-text text-4xl md:text-6xl tracking-[0.1em] uppercase leading-none"
+              style={{
+                fontFamily: "'Russo One', sans-serif",
+                color: 'var(--accent-primary)',
+                textShadow: '0 0 35px rgba(0,255,136,0.6), 0 0 70px rgba(0,255,136,0.3)',
+              }}
+            >
+              NARASINGA SIAGA
+            </h1>
+          )}
+
+          {/* Motto Line 2 - PERBATASAN TERJAGA */}
+          {shouldAnimate ? (
+            <motion.h1
+              variants={textVariants.line2}
+              initial="hidden"
+              animate="visible"
+              className="glitch-text text-3xl md:text-5xl tracking-[0.1em] uppercase leading-none"
+              style={{
+                fontFamily: "'Russo One', sans-serif",
+                color: 'var(--accent-primary)',
+                textShadow: '0 0 30px rgba(0,255,136,0.5), 0 0 60px rgba(0,255,136,0.25)',
+              }}
+            >
+              PERBATASAN TERJAGA
+            </motion.h1>
+          ) : (
+            <h1
+              className="glitch-text text-3xl md:text-5xl tracking-[0.1em] uppercase leading-none"
+              style={{
+                fontFamily: "'Russo One', sans-serif",
+                color: 'var(--accent-primary)',
+                textShadow: '0 0 30px rgba(0,255,136,0.5), 0 0 60px rgba(0,255,136,0.25)',
+              }}
+            >
+              PERBATASAN TERJAGA
+            </h1>
+          )}
+
+          {/* Subtitle */}
+          {shouldAnimate ? (
+            <motion.p
+              variants={textVariants.subtitle}
+              initial="hidden"
+              animate="visible"
+              className="text-sm md:text-base tracking-[0.25em] uppercase mt-4"
+              style={{ fontFamily: "'Russo One', sans-serif", color: 'var(--text-tertiary)' }}
+            >
+              SATGAS PAMTAS RI-MLY YONKAV 8/NSW TA 2026
+            </motion.p>
+          ) : (
+            <p
+              className="text-sm md:text-base tracking-[0.25em] uppercase mt-4"
+              style={{ fontFamily: "'Russo One', sans-serif", color: 'var(--text-tertiary)' }}
+            >
+              SATGAS PAMTAS RI-MLY YONKAV 8/NSW TA 2026
+            </p>
+          )}
+        </div>
+
+        {/* Logo - Top Right with motion */}
+        {shouldAnimate ? (
+          <motion.img
+            src={`${import.meta.env.BASE_URL}logo.png`}
+            alt="Logo"
+            className="absolute"
+            style={{
+              left: '86.63%',
+              top: '5.11%',
+              maxWidth: '220px',
+              height: 'auto',
+              zIndex: 10,
+            }}
+            variants={logoVariants}
+            initial="hidden"
+            animate={loaded ? ['visible', 'float'] : 'hidden'}
+          />
+        ) : (
+          <img
+            src={`${import.meta.env.BASE_URL}logo.png`}
+            alt="Logo"
+            className="absolute"
+            style={{
+              left: '86.63%',
+              top: '5.11%',
+              maxWidth: '220px',
+              height: 'auto',
+              zIndex: 10,
+            }}
+          />
+        )}
+
+        {/* BOTTOM LEFT PANEL ROW */}
+        <div
+          className="flex-shrink-0 px-6 pb-6 transition-all duration-[800ms]"
+          style={{
+            opacity: prefersReducedMotion ? 1 : (loaded ? 1 : 0),
+            transform: prefersReducedMotion ? 'translateY(0)' : (loaded ? 'translateY(0)' : 'translateY(16px)'),
+          }}
+        >
+          {/* HUD Panel - Lighter with subtle glow */}
+          <div
+            className="inline-flex gap-3 p-4 rounded-sm"
+            style={{
+              background: 'rgba(5,8,16,0.5)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(0,255,136,0.25)',
+              boxShadow: '0 0 30px rgba(0,255,136,0.08), inset 0 0 20px rgba(0,255,136,0.03)',
+            }}
+          >
+            {/* PERSONEL */}
+            <StatPanel
               label="PERSONEL"
               value={totalPersonel}
               color="var(--accent-primary)"
-              icon={<PersonIcon />}
             />
-            <StatCard
+
+            {/* POS AKTIF */}
+            <StatPanel
               label="POS AKTIF"
               value={totalPos}
               color="var(--color-info)"
-              icon={<PosIcon />}
             />
-            <StatCard
+
+            {/* INSIDEN */}
+            <StatPanel
               label="INSIDEN"
               value={aktifCount}
               color={aktifCount > 0 ? 'var(--color-danger)' : 'var(--accent-primary)'}
               pulse={aktifCount > 0}
-              icon={<InsidenIcon />}
             />
-          </div>
 
-          {/* Row 2: Overview - Insiden - Laporan */}
-          <div className="flex gap-3">
-            <ActionCard
-              label="OVERVIEW"
+            {/* Divider */}
+            <div className="w-px" style={{ background: 'rgba(0,255,136,0.2)' }} />
+
+            {/* OVERVIEW */}
+            <ActionPanel
               icon={<MapIcon />}
-              color="var(--accent-primary)"
+              label="OVERVIEW"
               onClick={() => navigate('/overview')}
+              color="var(--accent-primary)"
             />
-            <ActionCard
-              label="INSIDEN"
+
+            {/* INSIDEN Action */}
+            <ActionPanel
               icon={<AlertIcon />}
-              color={aktifCount > 0 ? 'var(--color-danger)' : 'var(--accent-primary)'}
+              label="INSIDEN"
               onClick={() => navigate('/insiden')}
+              color={aktifCount > 0 ? 'var(--color-danger)' : 'var(--accent-primary)'}
               badge={aktifCount > 0 ? aktifCount : null}
             />
-            <ActionCard
-              label="LAPORAN"
+
+            {/* LAPORAN */}
+            <ActionPanel
               icon={<ChartIcon />}
-              color="var(--color-purple)"
+              label="LAPORAN"
               onClick={() => navigate('/laporan/kerawanan')}
+              color="var(--color-purple)"
             />
           </div>
         </div>
@@ -170,6 +359,82 @@ export default function HomePage() {
 
       {/* CSS ANIMATIONS */}
       <style>{`
+        /* Scanline Effect */
+        .scanline-overlay {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          z-index: 5;
+          overflow: hidden;
+        }
+        .scanline-overlay::before {
+          content: '';
+          position: absolute;
+          top: -100%;
+          left: 0;
+          right: 0;
+          height: 200%;
+          background: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(0,255,136,0.02) 50%,
+            transparent 100%
+          );
+          animation: scanline 5s linear infinite;
+        }
+        @keyframes scanline {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(50%); }
+        }
+
+        /* Glitch Text Effect */
+        .glitch-text {
+          position: relative;
+          animation: glitch-skew 6s infinite linear alternate-reverse;
+        }
+        .glitch-text::before,
+        .glitch-text::after {
+          content: attr(data-text);
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+        }
+        .glitch-text::before {
+          color: #ff0088;
+          animation: glitch-1 0.4s infinite linear alternate-reverse;
+          clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+          transform: translate(-2px);
+          opacity: 0.7;
+        }
+        .glitch-text::after {
+          color: #00ffff;
+          animation: glitch-2 0.4s infinite linear alternate-reverse;
+          clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+          transform: translate(2px);
+          opacity: 0.7;
+        }
+        @keyframes glitch-1 {
+          0% { transform: translate(-2px); }
+          100% { transform: translate(2px); }
+        }
+        @keyframes glitch-2 {
+          0% { transform: translate(2px); }
+          100% { transform: translate(-2px); }
+        }
+        @keyframes glitch-skew {
+          0% { transform: skew(0deg); }
+          20% { transform: skew(0deg); }
+          21% { transform: skew(1deg); }
+          22% { transform: skew(0deg); }
+          80% { transform: skew(0deg); }
+          81% { transform: skew(-0.5deg); }
+          82% { transform: skew(0deg); }
+          100% { transform: skew(0deg); }
+        }
+
+        /* Glow Border */
         .glow-border {
           position: absolute;
           inset: 0;
@@ -188,33 +453,38 @@ export default function HomePage() {
             border-color: rgba(0,255,136,0.15);
           }
         }
+
+        /* Particle Float */
+        .particle {
+          position: absolute;
+          width: 2px;
+          height: 2px;
+          background: var(--accent-primary);
+          border-radius: 50%;
+          opacity: 0.3;
+          animation: float-particle linear infinite;
+        }
+        @keyframes float-particle {
+          0% {
+            transform: translateY(0) translateX(0);
+            opacity: 0;
+          }
+          10% { opacity: 0.4; }
+          90% { opacity: 0.4; }
+          100% {
+            transform: translateY(-100vh) translateX(20px);
+            opacity: 0;
+          }
+        }
       `}</style>
     </div>
   )
 }
 
-/* Stat Card Component */
-function StatCard({ label, value, color, pulse, icon }) {
+/* Stat Panel (Bottom Left) */
+function StatPanel({ label, value, color, pulse }) {
   return (
-    <div
-      className="flex-1 flex flex-col items-center justify-center px-4 py-4 rounded-sm"
-      style={{
-        background: 'rgba(5,8,16,0.7)',
-        backdropFilter: 'blur(12px)',
-        border: `1px solid ${color}40`,
-        boxShadow: `0 0 20px ${color}15, inset 0 0 15px ${color}08`,
-        minHeight: '100px',
-      }}
-    >
-      {/* Icon */}
-      <div
-        className="w-8 h-8 mb-2"
-        style={{ color, filter: `drop-shadow(0 0 6px ${color}60)` }}
-      >
-        {icon}
-      </div>
-
-      {/* Value */}
+    <div className="flex flex-col items-center px-4 py-2">
       <div className="flex items-center gap-2">
         {pulse && (
           <span
@@ -223,17 +493,15 @@ function StatCard({ label, value, color, pulse, icon }) {
           />
         )}
         <span
-          className="text-2xl font-bold font-mono"
-          style={{ color, textShadow: `0 0 15px ${color}80` }}
+          className="text-xl font-bold font-mono"
+          style={{ color, textShadow: `0 0 12px ${color}80` }}
         >
           {value.toLocaleString('id-ID')}
         </span>
       </div>
-
-      {/* Label */}
       <span
-        className="text-[10px] tracking-[0.2em] uppercase mt-2 font-semibold"
-        style={{ color: 'rgba(200,214,229,0.7)' }}
+        className="text-[9px] tracking-[0.2em] uppercase mt-1.5 font-medium"
+        style={{ color: 'rgba(200,214,229,0.6)' }}
       >
         {label}
       </span>
@@ -241,8 +509,8 @@ function StatCard({ label, value, color, pulse, icon }) {
   )
 }
 
-/* Action Card Component */
-function ActionCard({ label, icon, color, onClick, badge }) {
+/* Action Panel (Bottom Left) */
+function ActionPanel({ icon, label, onClick, color, badge }) {
   const [hovered, setHovered] = useState(false)
 
   return (
@@ -250,40 +518,33 @@ function ActionCard({ label, icon, color, onClick, badge }) {
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="flex-1 relative flex flex-col items-center justify-center px-4 py-4 rounded-sm transition-all duration-150"
+      className="relative flex flex-col items-center justify-center px-4 py-2 rounded-sm transition-all duration-150"
       style={{
-        background: hovered ? `${color}20` : 'rgba(5,8,16,0.7)',
-        backdropFilter: 'blur(12px)',
-        border: `1px solid ${hovered ? color : `${color}30`}`,
-        boxShadow: hovered ? `0 0 20px ${color}30` : `0 0 10px ${color}10`,
-        minHeight: '100px',
-        transform: hovered ? 'scale(1.03)' : 'scale(1)',
+        background: hovered ? `${color}20` : 'transparent',
+        border: `1px solid ${hovered ? color : 'rgba(0,255,136,0.1)'}`,
+        transform: hovered ? 'scale(1.08)' : 'scale(1)',
+        boxShadow: hovered ? `0 0 15px ${color}30` : 'none',
       }}
     >
-      {/* Icon */}
       <div
-        className="w-8 h-8 mb-2"
-        style={{ color, filter: hovered ? `drop-shadow(0 0 8px ${color})` : `drop-shadow(0 0 4px ${color}40)` }}
+        className="w-6 h-6 mb-1.5"
+        style={{ color, filter: hovered ? `drop-shadow(0 0 6px ${color})` : 'none' }}
       >
         {icon}
       </div>
-
-      {/* Label */}
       <span
-        className="text-[10px] tracking-[0.2em] font-bold uppercase"
+        className="text-[9px] tracking-[0.15em] font-semibold uppercase"
         style={{ color }}
       >
         {label}
       </span>
-
-      {/* Badge */}
       {badge && (
         <span
-          className="absolute -top-1 -right-1 w-5 h-5 rounded-full text-[8px] font-bold flex items-center justify-center animate-pulse"
+          className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[8px] font-bold flex items-center justify-center animate-pulse"
           style={{
             background: 'var(--color-danger)',
             color: '#fff',
-            boxShadow: '0 0 10px var(--color-danger)',
+            boxShadow: '0 0 8px var(--color-danger)',
           }}
         >
           {badge}
@@ -293,36 +554,43 @@ function ActionCard({ label, icon, color, onClick, badge }) {
   )
 }
 
+/* Particles */
+function Particles({ count = 15 }) {
+  const particles = useRef(
+    Array.from({ length: count }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      delay: Math.random() * 8,
+      duration: 12 + Math.random() * 8,
+      size: 1 + Math.random() * 2,
+    }))
+  ).current
+
+  return (
+    <div className="absolute inset-0 pointer-events-none z-[4]" aria-hidden="true">
+      {particles.map((p) => (
+        <div
+          key={p.id}
+          className="particle"
+          style={{
+            left: `${p.left}%`,
+            bottom: '-10px',
+            width: `${p.size}px`,
+            height: `${p.size}px`,
+            animationDelay: `${p.delay}s`,
+            animationDuration: `${p.duration}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
 /* Icons */
-function PersonIcon() {
-  return (
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-    </svg>
-  )
-}
-
-function PosIcon() {
-  return (
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-    </svg>
-  )
-}
-
-function InsidenIcon() {
-  return (
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-    </svg>
-  )
-}
-
 function MapIcon() {
   return (
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6-10l6 3m0 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6-10l6 3m0 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4" />
     </svg>
   )
 }
@@ -330,7 +598,7 @@ function MapIcon() {
 function AlertIcon() {
   return (
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
     </svg>
   )
 }
