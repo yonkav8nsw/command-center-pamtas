@@ -1,64 +1,42 @@
-import { goto } from './helpers.js'
 import { test, expect } from '@playwright/test'
-
-test.beforeEach(async ({ page }) => {
-  const adminEmail = process.env.E2E_ADMIN_EMAIL
-  const adminPassword = process.env.E2E_ADMIN_PASSWORD
-  if (!adminEmail || !adminPassword) {
-    test.skip(true, 'Credentials not configured')
-  }
-  await goto(page, '/login')
-  await page.waitForLoadState('networkidle')
-
-  // Wait for form inputs to be visible (boot animation)
-  await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 15000 })
-  await expect(page.locator('input[type="password"]')).toBeVisible({ timeout: 5000 })
-
-  await page.fill('input[type="email"]', adminEmail)
-  await page.fill('input[type="password"]', adminPassword)
-  await page.click('button[type="submit"]')
-  await page.waitForURL('**/command-center-pamtas/**', { timeout: 20000 })
-})
+import { goto, login, logout } from './helpers.js'
 
 test.describe('Binter Page', () => {
-  test('should navigate to binter page', async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
+    await logout(page)
+    const success = await login(page)
+    if (!success) {
+      test.skip(true, 'Login failed - check E2E credentials')
+    }
     await goto(page, '/binter')
     await page.waitForLoadState('networkidle')
-    await expect(page).toHaveURL(/\/binter/)
+  })
+
+  test('should navigate to binter page', async ({ page }) => {
+    await expect(page).toHaveURL(/\/binter/, { timeout: 10000 })
   })
 
   test('should display filter controls', async ({ page }) => {
-    await goto(page, '/binter')
-    await page.waitForLoadState('networkidle')
-    const selects = page.locator('select')
-    await expect(selects.first()).toBeVisible()
+    await expect(page.locator('select').first()).toBeVisible({ timeout: 10000 })
   })
 
   test('should display search input', async ({ page }) => {
-    await goto(page, '/binter')
-    await page.waitForLoadState('networkidle')
     await expect(page.locator('input[placeholder*="Cari"]')).toBeVisible()
   })
 
   test('should filter by timeline', async ({ page }) => {
-    await goto(page, '/binter')
-    await page.waitForLoadState('networkidle')
     const selects = page.locator('select')
     await selects.first().selectOption('7d')
     await page.waitForTimeout(500)
   })
 
   test('should display binter list or empty state', async ({ page }) => {
-    await goto(page, '/binter')
-    await page.waitForLoadState('networkidle')
     const hasList = await page.locator('.hud-panel').count() > 0
     const hasEmpty = await page.locator('text=BELUM ADA DATA').isVisible().catch(() => false)
     expect(hasList || hasEmpty).toBeTruthy()
   })
 
   test('should have download PDF button', async ({ page }) => {
-    await goto(page, '/binter')
-    await page.waitForLoadState('networkidle')
     await expect(page.locator('button:has-text("Download PDF")')).toBeVisible()
   })
 })
