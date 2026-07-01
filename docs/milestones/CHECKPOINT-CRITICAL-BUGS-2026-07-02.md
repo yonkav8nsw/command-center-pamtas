@@ -7,7 +7,7 @@
 
 ---
 
-## BUGS TO FIX
+## BUGS STATUS
 
 ### BUG-A: Home Page Issues ✅ FIXED
 - [x] NARASINGA SIAGA text missing
@@ -19,23 +19,30 @@
 **Commit:** `e519aeb`
 
 ### BUG-B: POS Pages - Buttons Not Clickable
-- [ ] Cannot click buttons on POS detail pages
-- [ ] Need visual inspection
+- [ ] Need credentials to test authenticated pages
 
 ### BUG-C: After Refresh - Screen Unresponsive
-- [ ] After page refresh, screen becomes unresponsive
-- [ ] Possible auth state issue
+- [ ] Fixed AuthContext timeout (10s fallback added)
+- [ ] Need credentials to verify
+
+### AUTH FIXES APPLIED
+- [x] AuthContext timeout fallback (10s) added
+- [x] Better error handling
+
+---
+
+## TEST RESULTS
+- Login tests: 6 PASS ✅
+- Authenticated tests: SKIPPED (no E2E credentials)
 
 ---
 
 ## NEXT STEPS
 
-1. [ ] Push CLAUDE.md changes to feature branch
-2. [ ] Create PR for HomePage fix
-3. [ ] Investigate BUG-B (POS buttons)
-4. [ ] Investigate BUG-C (refresh issue)
-5. [ ] Verify all fixes
-6. [ ] Merge to main
+1. [x] Commit all fixes
+2. [ ] Push to feature branch
+3. [ ] Create PR
+4. [ ] Test authenticated pages with credentials
 
 ---
 
