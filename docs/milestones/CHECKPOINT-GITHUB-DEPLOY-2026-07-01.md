@@ -30,7 +30,7 @@ Jika sesi interrupted, lanjutkan dari langkah terakhir yang belum completed:
 **Link:** https://github.com/yonkav8nsw/command-center-pamtas/settings/secrets/actions
 
 ### PHASE 3: Supabase SQL Migration
-- [ ] Run supabase/add_tokoh_catatan.sql in Supabase Dashboard
+- [x] Run supabase/add_tokoh_catatan.sql in Supabase Dashboard - **SUCCESS** ✅
 
 **Link:** https://supabase.com/dashboard → SQL Editor
 
