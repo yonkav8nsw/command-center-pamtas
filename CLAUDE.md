@@ -70,6 +70,16 @@ Prioritize operational continuity over visual enhancements.
 
 Treat all operational, personnel, incident, and monitoring data as mission-critical.
 
+## Session & Checkpoint Rules (WAJIB)
+
+1. **Checkpointing:** Selalu buat file checkpoint di `docs/milestones/CHECKPOINT-*.md` saat mulai pekerjaan signifikan. Include: fase saat ini, langkah selanjutnya, file yang berubah. Update setiap selesai langkah.
+
+2. **Maximal Effort:** Kerja sampai SELESAI, bukan "cukup bisa jalan". Investigasi root cause, bukan hanya gejala. Verifikasi dengan build + test sebelum melaporkan selesai.
+
+3. **Session Continuity:** Baca `memory/MEMORY.md` di awal sesi untuk understand context. Jangan ulangi kerjaan user yang sudah selesai.
+
+4. **User Communication:** Laporkan progress jelas dengan status indicators. Jika blocked, jelaskan kenapa dan suggest alternatives.
+
 ## Git & Credential Safety (WAJIB — berlaku untuk semua model/sesi)
 
 Aturan ini bersifat permanen dan mengikat lintas sesi dan lintas model (Opus, Sonnet, atau lainnya).

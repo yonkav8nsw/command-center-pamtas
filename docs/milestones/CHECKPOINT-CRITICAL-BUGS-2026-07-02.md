@@ -1,88 +1,42 @@
 # CHECKPOINT — CRITICAL BUGS FIX
 
 **Date:** 2026-07-02
-**Branch:** main (after merge)
+**Branch:** `feature/ui-evolution-v1`
 **Status:** IN PROGRESS
-**Priority:** CRITICAL - Dashboard not working
+**Priority:** CRITICAL
 
 ---
 
-## RESUME INSTRUCTIONS
+## BUGS TO FIX
 
-If session interrupted:
-1. Read this checkpoint
-2. Run: `npm run test:e2e:ui` to verify bugs
-3. Continue from next uncompleted fix
-4. Commit + push after each fix
+### BUG-A: Home Page Issues ✅ FIXED
+- [x] NARASINGA SIAGA text missing
+- [x] PERBATASAN TERJAGA text missing
+- [x] Logo not showing
+- [x] SATGAS tagline missing
 
----
-
-## USER-REPORTED CRITICAL BUGS
-
-### BUG-A: Home Page Issues
-- [ ] NARASINGA SIAGA text missing
-- [ ] PERBATASAN TERJAGA text missing
-- [ ] Logo not showing
-- [ ] TAGLINE missing: "SATGAS PAMTAS RI-MLY YONKAV 8/NSW TA 2026"
-
-**Suspected Cause:** HomePage.jsx design mismatch or asset path issues
+**Fix:** Restored main branch HomePage.jsx
+**Commit:** `e519aeb`
 
 ### BUG-B: POS Pages - Buttons Not Clickable
-- [ ] Cannot click any buttons on POS detail pages
-- [ ] Affects: /pos/KT and all other POS pages
-
-**Suspected Cause:** CSS overlay, z-index issue, or JavaScript error
+- [ ] Cannot click buttons on POS detail pages
+- [ ] Need visual inspection
 
 ### BUG-C: After Refresh - Screen Unresponsive
-- [ ] After page refresh, entire screen becomes unresponsive
-- [ ] Cannot click anything
-
-**Suspected Cause:** Auth state issue, Supabase connection error, or JS crash
+- [ ] After page refresh, screen becomes unresponsive
+- [ ] Possible auth state issue
 
 ---
 
-## INVESTIGATION PLAN
+## NEXT STEPS
 
-### Step 1: Run Playwright UI to see bugs visually
-```bash
-npm run test:e2e:ui
-```
-
-### Step 2: Check HomePage.jsx for missing elements
-- Compare deployed vs local
-- Check if NARASINGA text is in code
-
-### Step 3: Check for JavaScript errors
-- Browser console errors
-- Network request failures
-
-### Step 4: Fix identified issues
-- HomePage.jsx fixes
-- CSS overlay fixes
-- Auth state fixes
-
-### Step 5: Verify fixes
-- Build test
-- Playwright test
-- Manual verification
+1. [ ] Push CLAUDE.md changes to feature branch
+2. [ ] Create PR for HomePage fix
+3. [ ] Investigate BUG-B (POS buttons)
+4. [ ] Investigate BUG-C (refresh issue)
+5. [ ] Verify all fixes
+6. [ ] Merge to main
 
 ---
 
-## FIX LOG
-
-| Time | Fix | Status |
-|------|-----|--------|
-| - | Investigation started | In Progress |
-| - | BUG-A: HomePage | Pending |
-| - | BUG-B: POS buttons | Pending |
-| - | BUG-C: Refresh issue | Pending |
-
----
-
-## NEXT STEP
-
-Investigate HomePage.jsx - check if NARASINGA text exists in code
-
----
-
-*Created: 2026-07-02*
+*Updated: 2026-07-02*
