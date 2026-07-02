@@ -1,4 +1,24 @@
 import { defineConfig, devices } from '@playwright/test'
+import { readFileSync } from 'fs'
+
+// Load .env file for E2E credentials
+function loadEnv() {
+  try {
+    const envFile = readFileSync('.env', 'utf-8')
+    envFile.split('\n').forEach(line => {
+      const [key, ...valueParts] = line.split('=')
+      if (key && valueParts.length) {
+        const value = valueParts.join('=').trim()
+        if (!process.env[key.trim()]) {
+          process.env[key.trim()] = value
+        }
+      }
+    })
+  } catch (e) {
+    // .env file not found, use defaults
+  }
+}
+loadEnv()
 
 // Base URL: use environment variable or fallback to dev server
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173/command-center-pamtas'

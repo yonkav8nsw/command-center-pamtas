@@ -146,7 +146,7 @@ export function Modal({
       className={`
         fixed inset-0 z-[var(--z-modal)] flex items-center justify-center p-4
         transition-opacity duration-200
-        ${isExiting ? 'opacity-0' : 'opacity-100'}
+        ${isExiting ? 'opacity-0 pointer-events-none' : 'opacity-100'}
       `}
       style={{
         backgroundColor: 'var(--overlay-scrim)',

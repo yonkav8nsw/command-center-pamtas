@@ -144,7 +144,7 @@ function ConfirmDialogUI({ dialog, onConfirm, onCancel }) {
       className={`
         fixed inset-0 z-[calc(var(--z-modal)+1)] flex items-center justify-center
         transition-opacity duration-150
-        ${isExiting ? 'opacity-0' : 'opacity-100'}
+        ${isExiting ? 'opacity-0 pointer-events-none' : 'opacity-100'}
       `}
       style={{
         backgroundColor: 'var(--overlay-scrim)',
