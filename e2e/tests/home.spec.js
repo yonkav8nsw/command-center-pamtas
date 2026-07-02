@@ -9,7 +9,9 @@ test.describe('Home Page', () => {
       test.skip(true, 'Login failed - check E2E credentials')
     }
     await goto(page, '/')
-    await page.waitForLoadState('networkidle')
+    // Wait for loading to complete
+    await page.waitForSelector('text=MEMUAT SESI', { state: 'hidden', timeout: 15000 }).catch(() => {})
+    await page.waitForTimeout(2000)
   })
 
   test('should display hero banner', async ({ page }) => {
@@ -17,7 +19,9 @@ test.describe('Home Page', () => {
   })
 
   test('should display sidebar navigation', async ({ page }) => {
-    await expect(page.locator('nav, aside')).toBeVisible()
+    // Check for sidebar navigation section
+    const hasSidebar = await page.getByText('NAVIGASI').first().isVisible({ timeout: 3000 }).catch(() => false)
+    expect(hasSidebar).toBeTruthy()
   })
 
   test('should display stat panels', async ({ page }) => {
@@ -42,9 +46,10 @@ test.describe('Home Page', () => {
   })
 
   test('should display POS list in sidebar', async ({ page }) => {
-    const hasPos = await page.locator('a[href^="/pos/"]').first().isVisible().catch(() => false)
-    const hasSidebar = await page.locator('aside').isVisible().catch(() => false)
-    expect(hasPos || hasSidebar).toBeTruthy()
+    // Check for POS links or sidebar section with POS
+    const hasPos = await page.locator('a[href*="/pos/"]').first().isVisible({ timeout: 3000 }).catch(() => false)
+    const hasSidebarPos = await page.locator('text=17 POS SATGAS').first().isVisible({ timeout: 3000 }).catch(() => false)
+    expect(hasPos || hasSidebarPos).toBeTruthy()
   })
 
   test('should navigate to POS detail', async ({ page }) => {

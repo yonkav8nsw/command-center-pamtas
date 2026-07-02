@@ -17,7 +17,12 @@ test.describe('Smoke Tests', () => {
 
   test('sidebar navigation exists', async ({ page }) => {
     await goto(page, '/')
-    const hasNav = await page.locator('nav, aside, [role="navigation"]').first().isVisible().catch(() => false)
+    // Wait for loading to complete
+    await page.waitForSelector('text=MEMUAT SESI', { state: 'hidden', timeout: 15000 }).catch(() => {})
+    await page.waitForTimeout(2000)
+
+    // Check for sidebar navigation section
+    const hasNav = await page.getByText('NAVIGASI').first().isVisible({ timeout: 5000 }).catch(() => false)
     expect(hasNav).toBeTruthy()
   })
 
