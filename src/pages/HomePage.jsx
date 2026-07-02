@@ -149,7 +149,7 @@ export default function HomePage() {
           className="absolute"
           style={{
             left: '8.66%',
-            bottom: '17.43%',
+            bottom: '16%',
             zIndex: 10,
           }}
         >
@@ -160,15 +160,14 @@ export default function HomePage() {
                 variants={textVariants.line1}
                 initial="hidden"
                 animate="visible"
-                className="cyberpunk-glitch text-4xl md:text-5xl lg:text-6xl tracking-[0.08em] uppercase leading-none"
+                className="cyberpunk-glitch text-2xl md:text-3xl lg:text-4xl tracking-[0.1em] uppercase leading-none"
                 style={{
                   fontFamily: "'Russo One', sans-serif",
                   color: '#00FF88',
                   textShadow: `
-                    0 0 10px #00FF88,
-                    0 0 20px #00FF88,
-                    0 0 40px #00FF88,
-                    0 0 80px rgba(0,255,136,0.6)
+                    0 0 8px #00FF88,
+                    0 0 16px #00FF88,
+                    0 0 32px rgba(0,255,136,0.8)
                   `,
                 }}
                 data-text="NARASINGA SIAGA"
@@ -177,15 +176,14 @@ export default function HomePage() {
               </motion.h1>
             ) : (
               <h1
-                className="text-4xl md:text-5xl lg:text-6xl tracking-[0.08em] uppercase leading-none"
+                className="text-2xl md:text-3xl lg:text-4xl tracking-[0.1em] uppercase leading-none"
                 style={{
                   fontFamily: "'Russo One', sans-serif",
                   color: '#00FF88',
                   textShadow: `
-                    0 0 10px #00FF88,
-                    0 0 20px #00FF88,
-                    0 0 40px #00FF88,
-                    0 0 80px rgba(0,255,136,0.6)
+                    0 0 8px #00FF88,
+                    0 0 16px #00FF88,
+                    0 0 32px rgba(0,255,136,0.8)
                   `,
                 }}
               >
@@ -201,15 +199,14 @@ export default function HomePage() {
                 variants={textVariants.line2}
                 initial="hidden"
                 animate="visible"
-                className="cyberpunk-glitch text-4xl md:text-5xl lg:text-6xl tracking-[0.08em] uppercase leading-none"
+                className="cyberpunk-glitch text-2xl md:text-3xl lg:text-4xl tracking-[0.1em] uppercase leading-none"
                 style={{
                   fontFamily: "'Russo One', sans-serif",
                   color: '#00FF88',
                   textShadow: `
-                    0 0 10px #00FF88,
-                    0 0 20px #00FF88,
-                    0 0 40px #00FF88,
-                    0 0 80px rgba(0,255,136,0.6)
+                    0 0 8px #00FF88,
+                    0 0 16px #00FF88,
+                    0 0 32px rgba(0,255,136,0.8)
                   `,
                 }}
                 data-text="PERBATASAN TERJAGA"
@@ -218,15 +215,14 @@ export default function HomePage() {
               </motion.h1>
             ) : (
               <h1
-                className="text-4xl md:text-5xl lg:text-6xl tracking-[0.08em] uppercase leading-none"
+                className="text-2xl md:text-3xl lg:text-4xl tracking-[0.1em] uppercase leading-none"
                 style={{
                   fontFamily: "'Russo One', sans-serif",
                   color: '#00FF88',
                   textShadow: `
-                    0 0 10px #00FF88,
-                    0 0 20px #00FF88,
-                    0 0 40px #00FF88,
-                    0 0 80px rgba(0,255,136,0.6)
+                    0 0 8px #00FF88,
+                    0 0 16px #00FF88,
+                    0 0 32px rgba(0,255,136,0.8)
                   `,
                 }}
               >
@@ -241,7 +237,7 @@ export default function HomePage() {
               variants={textVariants.subtitle}
               initial="hidden"
               animate="visible"
-              className="white-neon-glow text-base md:text-lg tracking-[0.2em] uppercase mt-3"
+              className="white-neon-glow text-xs md:text-sm tracking-[0.2em] uppercase mt-2"
               style={{
                 fontFamily: "'Russo One', sans-serif",
                 color: '#ffffff',
@@ -252,15 +248,14 @@ export default function HomePage() {
             </motion.p>
           ) : (
             <p
-              className="text-base md:text-lg tracking-[0.2em] uppercase mt-3"
+              className="text-xs md:text-sm tracking-[0.2em] uppercase mt-2"
               style={{
                 fontFamily: "'Russo One', sans-serif",
                 color: '#ffffff',
                 textShadow: `
-                  0 0 5px rgba(255,255,255,0.9),
-                  0 0 10px rgba(255,255,255,0.7),
-                  0 0 20px rgba(255,255,255,0.5),
-                  0 0 40px rgba(255,255,255,0.3)
+                  0 0 4px rgba(255,255,255,0.8),
+                  0 0 8px rgba(255,255,255,0.6),
+                  0 0 16px rgba(255,255,255,0.4)
                 `,
                 letterSpacing: '0.2em',
               }}
@@ -379,43 +374,21 @@ export default function HomePage() {
           left: 0;
           width: 100%;
           height: 100%;
-          opacity: 0.8;
         }
-        /* Magenta/Cyan RGB split glitch layers */
+        /* Magenta/Cyan RGB split glitch layers - SUBTLE */
         .cyberpunk-glitch::before {
           color: #ff00ff;
           animation: glitch-cyan 3s infinite linear alternate-reverse;
-          clip-path: polygon(0 0, 100% 0, 100% 38%, 0 38%);
-          transform: translate(-3px, -1px);
-          text-shadow: -2px 0 #ff00ff;
-          mix-blend-mode: screen;
+          clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+          transform: translate(-2px, -1px);
+          opacity: 0;
         }
         .cyberpunk-glitch::after {
           color: #00ffff;
           animation: glitch-magenta 2.5s infinite linear alternate-reverse;
-          clip-path: polygon(0 62%, 100% 62%, 100% 100%, 0 100%);
-          transform: translate(3px, 1px);
-          text-shadow: 2px 0 #00ffff;
-          mix-blend-mode: screen;
-        }
-        /* Scanline overlay effect */
-        .cyberpunk-glitch {
-          position: relative;
-          overflow: hidden;
-        }
-        .cyberpunk-glitch::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.3) 2px,
-            rgba(0, 0, 0, 0.3) 4px
-          );
-          pointer-events: none;
-          z-index: 1;
+          clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+          transform: translate(2px, 1px);
+          opacity: 0;
         }
         @keyframes glitch-main {
           0%, 100% {
@@ -424,116 +397,63 @@ export default function HomePage() {
           }
           7% {
             transform: skew(0deg);
-            filter: brightness(1.2);
           }
           7.5% {
-            transform: skew(0.5deg);
-            filter: brightness(1.5) hue-rotate(10deg);
+            transform: skew(0.3deg);
+            filter: brightness(1.1);
           }
           8% {
-            transform: skew(-0.3deg);
-            filter: brightness(1);
+            transform: skew(-0.2deg);
           }
           9% {
             transform: skew(0deg);
           }
           92% {
             transform: skew(0deg);
-            filter: brightness(1);
           }
           92.5% {
-            transform: skew(-0.8deg) scaleY(1.02);
-            filter: brightness(1.3) hue-rotate(-15deg);
+            transform: skew(-0.4deg);
+            filter: brightness(1.05);
           }
           93% {
-            transform: skew(0.3deg) scaleY(0.98);
-            filter: brightness(1.1);
+            transform: skew(0.2deg);
           }
           93.5% {
             transform: skew(0deg);
-            filter: brightness(1);
           }
         }
         @keyframes glitch-cyan {
           0%, 100% {
-            transform: translate(-3px, -1px);
-            opacity: 0.8;
-          }
-          20% {
-            transform: translate(2px, 0px);
-            opacity: 0.6;
-          }
-          21% {
-            transform: translate(-4px, 1px);
-            opacity: 0.9;
-          }
-          40% {
-            transform: translate(-2px, -1px);
-            opacity: 0.7;
-          }
-          60% {
-            transform: translate(3px, 0px);
-            opacity: 0.5;
-          }
-          80% {
-            transform: translate(-1px, 1px);
-            opacity: 0.8;
-          }
-          /* Rapid flicker at glitch moments */
-          7% {
-            transform: translate(-6px, -2px);
-            opacity: 1;
+            opacity: 0;
           }
           7.5% {
-            transform: translate(4px, 2px);
             opacity: 0.4;
           }
+          8% {
+            opacity: 0;
+          }
           92.5% {
-            transform: translate(5px, 1px);
-            opacity: 1;
+            opacity: 0.35;
           }
           93% {
-            transform: translate(-4px, -1px);
-            opacity: 0.3;
+            opacity: 0;
           }
         }
         @keyframes glitch-magenta {
           0%, 100% {
-            transform: translate(3px, 1px);
-            opacity: 0.8;
-          }
-          25% {
-            transform: translate(-2px, 0px);
-            opacity: 0.6;
-          }
-          26% {
-            transform: translate(4px, -1px);
-            opacity: 0.9;
-          }
-          50% {
-            transform: translate(2px, 1px);
-            opacity: 0.7;
-          }
-          75% {
-            transform: translate(-3px, 0px);
-            opacity: 0.5;
-          }
-          /* Rapid flicker at glitch moments */
-          7% {
-            transform: translate(6px, 2px);
-            opacity: 1;
+            opacity: 0;
           }
           7.5% {
-            transform: translate(-4px, -2px);
-            opacity: 0.4;
+            opacity: 0.35;
+          }
+          8% {
+            opacity: 0;
           }
           92.5% {
-            transform: translate(-5px, -1px);
-            opacity: 1;
+            opacity: 0.4;
           }
           93% {
-            transform: translate(4px, 1px);
-            opacity: 0.3;
+            opacity: 0;
           }
         }
 
