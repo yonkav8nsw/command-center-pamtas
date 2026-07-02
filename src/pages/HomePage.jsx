@@ -144,11 +144,11 @@ export default function HomePage() {
         {/* Space for hamburger menu only */}
         <div className="h-12 flex-shrink-0" />
 
-        {/* Motto Text - Positioned absolutely */}
+        {/* Motto Text - Left aligned */}
         <div
-          className="absolute text-right"
+          className="absolute"
           style={{
-            left: '45.72%',
+            left: '8.66%',
             bottom: '17.43%',
             zIndex: 10,
           }}
@@ -159,7 +159,7 @@ export default function HomePage() {
               variants={textVariants.line1}
               initial="hidden"
               animate="visible"
-              className="glitch-text text-4xl md:text-6xl tracking-[0.1em] uppercase leading-none"
+              className="glitch-text text-3xl md:text-4xl tracking-[0.1em] uppercase leading-none"
               style={{
                 fontFamily: "'Russo One', sans-serif",
                 color: 'var(--accent-primary)',
@@ -170,7 +170,7 @@ export default function HomePage() {
             </motion.h1>
           ) : (
             <h1
-              className="glitch-text text-4xl md:text-6xl tracking-[0.1em] uppercase leading-none"
+              className="glitch-text text-3xl md:text-4xl tracking-[0.1em] uppercase leading-none"
               style={{
                 fontFamily: "'Russo One', sans-serif",
                 color: 'var(--accent-primary)',
@@ -187,7 +187,7 @@ export default function HomePage() {
               variants={textVariants.line2}
               initial="hidden"
               animate="visible"
-              className="glitch-text text-3xl md:text-5xl tracking-[0.1em] uppercase leading-none"
+              className="glitch-text text-3xl md:text-4xl tracking-[0.1em] uppercase leading-none"
               style={{
                 fontFamily: "'Russo One', sans-serif",
                 color: 'var(--accent-primary)',
@@ -198,7 +198,7 @@ export default function HomePage() {
             </motion.h1>
           ) : (
             <h1
-              className="glitch-text text-3xl md:text-5xl tracking-[0.1em] uppercase leading-none"
+              className="glitch-text text-3xl md:text-4xl tracking-[0.1em] uppercase leading-none"
               style={{
                 fontFamily: "'Russo One', sans-serif",
                 color: 'var(--accent-primary)',
@@ -215,14 +215,14 @@ export default function HomePage() {
               variants={textVariants.subtitle}
               initial="hidden"
               animate="visible"
-              className="text-sm md:text-base tracking-[0.25em] uppercase mt-4"
+              className="text-sm md:text-base tracking-[0.25em] uppercase mt-2"
               style={{ fontFamily: "'Russo One', sans-serif", color: 'var(--text-tertiary)' }}
             >
               SATGAS PAMTAS RI-MLY YONKAV 8/NSW TA 2026
             </motion.p>
           ) : (
             <p
-              className="text-sm md:text-base tracking-[0.25em] uppercase mt-4"
+              className="text-sm md:text-base tracking-[0.25em] uppercase mt-2"
               style={{ fontFamily: "'Russo One', sans-serif", color: 'var(--text-tertiary)' }}
             >
               SATGAS PAMTAS RI-MLY YONKAV 8/NSW TA 2026
@@ -237,10 +237,10 @@ export default function HomePage() {
             alt="Logo"
             className="absolute"
             style={{
-              left: '16.31%',
-              top: '10.14%',
-              width: '16.10%',
-              height: '27.18%',
+              left: '8.66%',
+              top: '8%',
+              width: '12%',
+              height: '18%',
               objectFit: 'contain',
               zIndex: 10,
             }}
@@ -254,24 +254,24 @@ export default function HomePage() {
             alt="Logo"
             className="absolute"
             style={{
-              left: '16.31%',
-              top: '10.14%',
-              width: '16.10%',
-              height: '27.18%',
+              left: '8.66%',
+              top: '8%',
+              width: '12%',
+              height: '18%',
               objectFit: 'contain',
               zIndex: 10,
             }}
           />
         )}
 
-        {/* HUD Panel - Professional Card Dashboard */}
+        {/* HUD Panel - Professional Card Dashboard - Bottom Right */}
         <div
           className="absolute"
           style={{
-            left: '8.66%',
-            top: '39.95%',
-            width: '31.40%',
-            height: '34.54%',
+            right: '8.66%',
+            bottom: '8%',
+            width: '28%',
+            height: '30%',
           }}
         >
           <TacticalHUD
@@ -489,7 +489,7 @@ function DashboardCard({ label, value, color, alert, index, prefersReducedMotion
     <div
       className="relative flex flex-col items-center justify-center rounded-lg overflow-hidden"
       style={{
-        background: 'rgba(15,20,30,0.85)',
+        background: 'rgba(15,20,30,0.55)',
         border: `1px solid ${color}30`,
         boxShadow: `0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 ${color}15`,
         animation: prefersReducedMotion ? 'none' : `cardFadeIn 400ms ${index * 60}ms ease-out forwards`,
