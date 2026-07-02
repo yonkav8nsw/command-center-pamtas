@@ -487,15 +487,15 @@ function TacticalHUD({ totalPersonel, totalPos, aktifCount, navigate, prefersRed
         <div className="flex-1 h-px mx-3" style={{ background: 'linear-gradient(90deg, rgba(0,255,136,0.4), transparent)' }} />
       </div>
 
-      {/* Content Grid */}
-      <div className="absolute inset-0 pt-8 pb-2 px-2">
-        {/* Row 1: Stats */}
-        <div className="grid grid-cols-3 gap-1.5 h-[calc(50%-4px)] mb-1">
+      {/* Content Area */}
+      <div className="absolute inset-0 pt-8 pb-1 px-1">
+        {/* Row 1: Stats - Seamless flex */}
+        <div className="h-[calc(50%-2px)] flex mb-0.5">
           <TacticalStat
             icon={<CrosshairIcon />}
             label="PERSONEL"
             value={totalPersonel}
-            color="#00ff88"
+            color="var(--accent-primary)"
             index={0}
             prefersReducedMotion={prefersReducedMotion}
           />
@@ -503,7 +503,7 @@ function TacticalHUD({ totalPersonel, totalPos, aktifCount, navigate, prefersRed
             icon={<TargetIcon />}
             label="POS AKTIF"
             value={totalPos}
-            color="#44aaff"
+            color="var(--color-info)"
             index={1}
             prefersReducedMotion={prefersReducedMotion}
           />
@@ -511,7 +511,7 @@ function TacticalHUD({ totalPersonel, totalPos, aktifCount, navigate, prefersRed
             icon={<AlertIcon />}
             label="INSIDEN"
             value={aktifCount}
-            color={aktifCount > 0 ? '#ff5555' : '#00ff88'}
+            color={aktifCount > 0 ? 'var(--color-danger)' : 'var(--accent-primary)'}
             index={2}
             pulse={aktifCount > 0}
             prefersReducedMotion={prefersReducedMotion}
@@ -519,15 +519,15 @@ function TacticalHUD({ totalPersonel, totalPos, aktifCount, navigate, prefersRed
         </div>
 
         {/* Divider */}
-        <div className="h-px mx-2 my-1" style={{ background: 'linear-gradient(90deg, transparent, rgba(0,255,136,0.3), transparent)' }} />
+        <div className="h-px mx-1 my-0.5" style={{ background: 'linear-gradient(90deg, transparent, rgba(0,255,136,0.25), transparent)' }} />
 
-        {/* Row 2: Actions */}
-        <div className="grid grid-cols-3 gap-1.5 h-[calc(50%-4px)]">
+        {/* Row 2: Actions - Seamless joined panels */}
+        <div className="h-[calc(50%-4px)] flex">
           <TacticalAction
             icon={<MapIcon />}
             label="OVERVIEW"
             onClick={() => navigate('/overview')}
-            color="#00ff88"
+            color="var(--accent-primary)"
             index={3}
             prefersReducedMotion={prefersReducedMotion}
           />
@@ -535,7 +535,7 @@ function TacticalHUD({ totalPersonel, totalPos, aktifCount, navigate, prefersRed
             icon={<AlertIcon />}
             label="INSIDEN"
             onClick={() => navigate('/insiden')}
-            color={aktifCount > 0 ? '#ff5555' : '#00ff88'}
+            color={aktifCount > 0 ? 'var(--color-danger)' : 'var(--accent-primary)'}
             badge={aktifCount > 0 ? aktifCount : null}
             index={4}
             prefersReducedMotion={prefersReducedMotion}
@@ -544,9 +544,10 @@ function TacticalHUD({ totalPersonel, totalPos, aktifCount, navigate, prefersRed
             icon={<ChartIcon />}
             label="LAPORAN"
             onClick={() => navigate('/laporan/kerawanan')}
-            color="#bb88ff"
+            color="var(--color-purple)"
             index={5}
             prefersReducedMotion={prefersReducedMotion}
+            isLast
           />
         </div>
       </div>
@@ -575,100 +576,150 @@ function CornerAccent({ position }) {
   )
 }
 
-/* Tactical Stat Display */
+/* Tactical Stat Display with Bracket Frame & Heartbeat */
 function TacticalStat({ icon, label, value, color, index, pulse, prefersReducedMotion }) {
   return (
     <div
-      className="relative flex flex-col items-center justify-center p-1.5 overflow-hidden"
+      className="relative flex-1 flex flex-col items-center justify-center px-2 py-1 border-r"
       style={{
-        background: 'rgba(0,255,136,0.03)',
-        border: '1px solid rgba(0,255,136,0.15)',
+        borderColor: 'rgba(0,255,136,0.12)',
         animation: prefersReducedMotion ? 'none' : `tacticalIn 300ms ${index * 80}ms ease-out forwards`,
         opacity: 0,
       }}
     >
-      {/* Icon Badge */}
+      {/* Status Dot - top right */}
       <div
-        className="absolute top-1 left-1/2 -translate-x-1/2 w-4 h-4 rounded-sm flex items-center justify-center"
-        style={{ background: `${color}15`, border: `1px solid ${color}40` }}
+        className={`absolute top-1 right-2 w-1.5 h-1.5 rounded-full ${pulse ? 'animate-pulse' : ''}`}
+        style={{ background: color, boxShadow: `0 0 8px ${color}` }}
+      />
+
+      {/* Icon Badge with Chamfer Frame */}
+      <div
+        className="mb-1"
+        style={{
+          background: `${color}10`,
+          border: `1px solid ${color}35`,
+          clipPath: 'polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px))',
+          padding: '4px',
+        }}
       >
-        <span style={{ color, fontSize: '10px' }}>{icon}</span>
+        <span style={{ color, fontSize: '10px', display: 'block' }}>{icon}</span>
       </div>
 
-      {/* Value */}
-      <div className="mt-3 flex items-baseline gap-0.5">
+      {/* Value with Bracket Corners */}
+      <div className="relative">
+        {/* Corner brackets */}
+        <span className="absolute -left-1 -top-1 w-2 h-2" style={{ borderTop: `1.5px solid ${color}`, borderLeft: `1.5px solid ${color}`, opacity: 0.6 }} />
+        <span className="absolute -right-1 -top-1 w-2 h-2" style={{ borderTop: `1.5px solid ${color}`, borderRight: `1.5px solid ${color}`, opacity: 0.6 }} />
+        <span className="absolute -left-1 -bottom-1 w-2 h-2" style={{ borderBottom: `1.5px solid ${color}`, borderLeft: `1.5px solid ${color}`, opacity: 0.6 }} />
+        <span className="absolute -right-1 -bottom-1 w-2 h-2" style={{ borderBottom: `1.5px solid ${color}`, borderRight: `1.5px solid ${color}`, opacity: 0.6 }} />
+
+        {/* Value */}
         <span
-          className="font-mono font-bold text-lg leading-none"
+          className="font-mono font-bold text-base leading-none px-1"
           style={{
             color,
-            textShadow: `0 0 10px ${color}60`,
+            textShadow: `0 0 12px ${color}80`,
             fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
           }}
         >
           {value.toLocaleString('id-ID')}
         </span>
-        {pulse && (
-          <span
-            className="w-1.5 h-1.5 rounded-full"
-            style={{
-              background: color,
-              boxShadow: `0 0 6px ${color}`,
-              animation: prefersReducedMotion ? 'none' : 'tacticalPulse 1s ease-in-out infinite',
-            }}
-          />
-        )}
       </div>
 
       {/* Label */}
       <span
-        className="text-[6px] uppercase tracking-[0.15em] mt-0.5 font-medium"
-        style={{
-          color: 'rgba(200,214,229,0.5)',
-          letterSpacing: '0.1em',
-        }}
+        className="text-[6px] uppercase tracking-[0.15em] mt-1 font-medium"
+        style={{ color: 'rgba(200,214,229,0.45)', letterSpacing: '0.1em' }}
       >
         {label}
       </span>
 
-      {/* Bottom accent line */}
-      <div
-        className="absolute bottom-0 left-2 right-2 h-px"
-        style={{ background: `linear-gradient(90deg, transparent, ${color}40, transparent)` }}
-      />
+      {/* Heartbeat/ECG Line */}
+      <div className="w-full mt-1 px-2">
+        <svg width="100%" height="4" viewBox="0 0 80 4" preserveAspectRatio="none">
+          <path
+            d="M0 2 L15 2 L20 0 L25 4 L30 1.5 L35 2.5 L45 2 L80 2"
+            fill="none"
+            stroke={color}
+            strokeWidth="0.75"
+            opacity="0.5"
+          />
+        </svg>
+      </div>
     </div>
   )
 }
 
-/* Tactical Action Button */
-function TacticalAction({ icon, label, onClick, color, badge, index, prefersReducedMotion }) {
-  const [pressed, setPressed] = useState(false)
+/* Tactical Action - Seamless Panel with Hazard Stripe */
+function TacticalAction({ icon, label, onClick, color, badge, index, prefersReducedMotion, isLast }) {
+  const [hovered, setHovered] = useState(false)
 
   return (
     <button
       onClick={onClick}
-      onMouseDown={() => setPressed(true)}
-      onMouseUp={() => setPressed(false)}
-      onMouseLeave={() => setPressed(false)}
-      className="relative flex flex-col items-center justify-center p-1.5 overflow-hidden"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className={`relative flex-1 flex flex-col items-center justify-center px-2 py-1 ${!isLast ? 'border-r' : ''}`}
       style={{
-        background: pressed ? `${color}10` : 'rgba(0,255,136,0.02)',
-        border: `1px solid ${pressed ? color : 'rgba(0,255,136,0.1)'}`,
-        transform: pressed ? 'scale(0.97)' : 'scale(1)',
+        background: hovered ? `${color}12` : 'rgba(0,0,0,0.25)',
+        borderColor: hovered ? color : 'rgba(0,255,136,0.12)',
+        borderWidth: '0px',
+        borderRightWidth: '1px',
+        boxShadow: hovered ? `0 0 15px ${color}30, inset 0 0 12px ${color}08` : 'none',
+        transform: hovered ? 'scale(1.01)' : 'scale(1)',
         transition: 'all 150ms ease',
         animation: prefersReducedMotion ? 'none' : `tacticalIn 300ms ${index * 80}ms ease-out forwards`,
         opacity: 0,
       }}
     >
-      {/* Icon */}
-      <div className="w-5 h-5 mb-0.5" style={{ color: pressed ? color : 'rgba(200,214,229,0.5)' }}>
-        {icon}
+      {/* Hazard Stripe - bottom right on hover */}
+      {hovered && (
+        <div
+          className="absolute bottom-0 right-0 w-10 h-2.5"
+          style={{
+            background: `repeating-linear-gradient(
+              -45deg,
+              ${color}25 0px,
+              ${color}25 2px,
+              transparent 2px,
+              transparent 4px
+            )`,
+          }}
+        />
+      )}
+
+      {/* Icon with Bracket Corner Frame */}
+      <div className="relative mb-0.5">
+        {/* Corner brackets */}
+        <span className="absolute -left-0.5 -top-0.5 w-1.5 h-1.5" style={{ borderTop: `1px solid ${hovered ? color : 'rgba(200,214,229,0.2)'}`, borderLeft: `1px solid ${hovered ? color : 'rgba(200,214,229,0.2)'}`, transition: 'border-color 150ms' }} />
+        <span className="absolute -right-0.5 -top-0.5 w-1.5 h-1.5" style={{ borderTop: `1px solid ${hovered ? color : 'rgba(200,214,229,0.2)'}`, borderRight: `1px solid ${hovered ? color : 'rgba(200,214,229,0.2)'}`, transition: 'border-color 150ms' }} />
+        <span className="absolute -left-0.5 -bottom-0.5 w-1.5 h-1.5" style={{ borderBottom: `1px solid ${hovered ? color : 'rgba(200,214,229,0.2)'}`, borderLeft: `1px solid ${hovered ? color : 'rgba(200,214,229,0.2)'}`, transition: 'border-color 150ms' }} />
+        <span className="absolute -right-0.5 -bottom-0.5 w-1.5 h-1.5" style={{ borderBottom: `1px solid ${hovered ? color : 'rgba(200,214,229,0.2)'}`, borderRight: `1px solid ${hovered ? color : 'rgba(200,214,229,0.2)'}`, transition: 'border-color 150ms' }} />
+
+        {/* Icon */}
+        <div style={{ color: hovered ? color : 'rgba(200,214,229,0.45)', transition: 'color 150ms' }} className="w-5 h-5">
+          {icon}
+        </div>
+
+        {/* Badge */}
+        {badge && (
+          <span
+            className="absolute -top-1.5 -right-1.5 font-mono text-[7px] font-bold px-1 py-0.5 rounded animate-pulse"
+            style={{ background: color, color: '#000', boxShadow: `0 0 8px ${color}` }}
+          >
+            {badge}
+          </span>
+        )}
       </div>
 
       {/* Label */}
       <span
         className="text-[7px] uppercase tracking-[0.12em] font-semibold"
         style={{
-          color: pressed ? color : 'rgba(200,214,229,0.6)',
+          color: hovered ? color : 'rgba(200,214,229,0.55)',
+          textShadow: hovered ? `0 0 8px ${color}50` : 'none',
+          transition: 'all 150ms',
           letterSpacing: '0.08em',
         }}
       >
@@ -680,37 +731,13 @@ function TacticalAction({ icon, label, onClick, color, badge, index, prefersRedu
         className="absolute bottom-0.5 right-1 text-[8px]"
         style={{
           color,
-          opacity: pressed ? 1 : 0.3,
-          transform: `translateX(${pressed ? 0 : -4}px)`,
-          transition: 'all 150ms ease',
+          opacity: hovered ? 0.9 : 0,
+          transform: hovered ? 'translateX(0)' : 'translateX(-4px)',
+          transition: 'all 150ms',
         }}
       >
         →
       </span>
-
-      {/* Badge */}
-      {badge && (
-        <span
-          className="absolute -top-0.5 -right-0.5 font-mono text-[7px] font-bold px-1 py-0.5 rounded-sm"
-          style={{
-            background: color,
-            color: '#000',
-            boxShadow: `0 0 8px ${color}`,
-          }}
-        >
-          {badge}
-        </span>
-      )}
-
-      {/* Left accent */}
-      <div
-        className="absolute left-0 top-1 bottom-1 w-px"
-        style={{
-          background: `linear-gradient(180deg, transparent, ${color}60, transparent)`,
-          opacity: pressed ? 1 : 0,
-          transition: 'opacity 150ms ease',
-        }}
-      />
     </button>
   )
 }
