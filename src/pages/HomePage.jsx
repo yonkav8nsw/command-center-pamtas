@@ -230,17 +230,18 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* Logo - Top Right with motion */}
+        {/* Logo - Centered above HUD Panel with motion */}
         {shouldAnimate ? (
           <motion.img
             src={`${import.meta.env.BASE_URL}logo-satgas.png`}
             alt="Logo"
             className="absolute"
             style={{
-              left: '86.63%',
-              top: '5.11%',
-              maxWidth: '220px',
-              height: 'auto',
+              left: '16.31%',
+              top: '10.14%',
+              width: '16.10%',
+              height: '27.18%',
+              objectFit: 'contain',
               zIndex: 10,
             }}
             variants={logoVariants}
@@ -253,28 +254,31 @@ export default function HomePage() {
             alt="Logo"
             className="absolute"
             style={{
-              left: '86.63%',
-              top: '5.11%',
-              maxWidth: '220px',
-              height: 'auto',
+              left: '16.31%',
+              top: '10.14%',
+              width: '16.10%',
+              height: '27.18%',
+              objectFit: 'contain',
               zIndex: 10,
             }}
           />
         )}
 
-        {/* BOTTOM LEFT PANEL ROW - Smaller, 3x2 grid, aligned with subtitle */}
+        {/* HUD Panel - 2 rows x 3 columns grid, positioned left-center */}
         <div
           className="absolute flex-shrink-0 transition-all duration-[800ms]"
           style={{
-            left: '45.72%',
-            bottom: '10%',
+            left: '8.66%',
+            top: '39.95%',
+            width: '31.40%',
+            height: '34.54%',
             opacity: prefersReducedMotion ? 1 : (loaded ? 1 : 0),
             transform: prefersReducedMotion ? 'translateY(0)' : (loaded ? 'translateY(0)' : 'translateY(16px)'),
           }}
         >
-          {/* HUD Panel - Smaller with 3x2 grid */}
+          {/* HUD Panel - 2x3 Grid Layout */}
           <div
-            className="grid grid-cols-3 gap-2 p-3 rounded-sm"
+            className="w-full h-full grid grid-cols-3 grid-rows-2 gap-2 p-4 rounded-sm"
             style={{
               background: 'rgba(5,8,16,0.5)',
               backdropFilter: 'blur(12px)',
@@ -282,58 +286,72 @@ export default function HomePage() {
               boxShadow: '0 0 20px rgba(0,255,136,0.08), inset 0 0 15px rgba(0,255,136,0.03)',
             }}
           >
+            {/* Row 1: Stats */}
             {/* PERSONEL */}
-            <StatPanel
-              label="PERSONEL"
-              value={totalPersonel}
-              color="var(--accent-primary)"
-              compact
-            />
+            <div className="flex items-center justify-center">
+              <StatPanel
+                label="PERSONEL"
+                value={totalPersonel}
+                color="var(--accent-primary)"
+                compact
+              />
+            </div>
 
             {/* POS AKTIF */}
-            <StatPanel
-              label="POS AKTIF"
-              value={totalPos}
-              color="var(--color-info)"
-              compact
-            />
+            <div className="flex items-center justify-center">
+              <StatPanel
+                label="POS AKTIF"
+                value={totalPos}
+                color="var(--color-info)"
+                compact
+              />
+            </div>
 
             {/* INSIDEN */}
-            <StatPanel
-              label="INSIDEN"
-              value={aktifCount}
-              color={aktifCount > 0 ? 'var(--color-danger)' : 'var(--accent-primary)'}
-              pulse={aktifCount > 0}
-              compact
-            />
+            <div className="flex items-center justify-center">
+              <StatPanel
+                label="INSIDEN"
+                value={aktifCount}
+                color={aktifCount > 0 ? 'var(--color-danger)' : 'var(--accent-primary)'}
+                pulse={aktifCount > 0}
+                compact
+              />
+            </div>
 
+            {/* Row 2: Actions */}
             {/* OVERVIEW */}
-            <ActionPanel
-              icon={<MapIcon />}
-              label="OVERVIEW"
-              onClick={() => navigate('/overview')}
-              color="var(--accent-primary)"
-              compact
-            />
+            <div className="flex items-center justify-center">
+              <ActionPanel
+                icon={<MapIcon />}
+                label="OVERVIEW"
+                onClick={() => navigate('/overview')}
+                color="var(--accent-primary)"
+                compact
+              />
+            </div>
 
             {/* INSIDEN Action */}
-            <ActionPanel
-              icon={<AlertIcon />}
-              label="INSIDEN"
-              onClick={() => navigate('/insiden')}
-              color={aktifCount > 0 ? 'var(--color-danger)' : 'var(--accent-primary)'}
-              badge={aktifCount > 0 ? aktifCount : null}
-              compact
-            />
+            <div className="flex items-center justify-center">
+              <ActionPanel
+                icon={<AlertIcon />}
+                label="INSIDEN"
+                onClick={() => navigate('/insiden')}
+                color={aktifCount > 0 ? 'var(--color-danger)' : 'var(--accent-primary)'}
+                badge={aktifCount > 0 ? aktifCount : null}
+                compact
+              />
+            </div>
 
             {/* LAPORAN */}
-            <ActionPanel
-              icon={<ChartIcon />}
-              label="LAPORAN"
-              onClick={() => navigate('/laporan/kerawanan')}
-              color="var(--color-purple)"
-              compact
-            />
+            <div className="flex items-center justify-center">
+              <ActionPanel
+                icon={<ChartIcon />}
+                label="LAPORAN"
+                onClick={() => navigate('/laporan/kerawanan')}
+                color="var(--color-purple)"
+                compact
+              />
+            </div>
           </div>
         </div>
       </div>
