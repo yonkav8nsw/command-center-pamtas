@@ -767,7 +767,6 @@ function ActionCard({ icon, label, onClick, color, badge, delay = 0, prefersRedu
     </button>
   )
 }
-}
 
 /* Particles */
 function Particles({ count = 15 }) {
