@@ -276,19 +276,20 @@ export default function HomePage() {
             transform: prefersReducedMotion ? 'translateY(0)' : (loaded ? 'translateY(0)' : 'translateY(16px)'),
           }}
         >
-          {/* HUD Panel - 2x3 Grid Layout */}
+          {/* HUD Panel - Enhanced 2x3 Grid Layout */}
           <div
-            className="w-full h-full grid grid-cols-3 grid-rows-2 gap-2 p-4 rounded-sm"
+            className="w-full h-full grid grid-cols-3 grid-rows-2 gap-3 p-4 rounded-sm"
             style={{
-              background: 'rgba(5,8,16,0.5)',
-              backdropFilter: 'blur(12px)',
-              border: '1px solid rgba(0,255,136,0.25)',
-              boxShadow: '0 0 20px rgba(0,255,136,0.08), inset 0 0 15px rgba(0,255,136,0.03)',
+              background: 'linear-gradient(135deg, rgba(5,8,16,0.65) 0%, rgba(10,15,25,0.55) 100%)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(0,255,136,0.2)',
+              boxShadow: '0 0 30px rgba(0,255,136,0.1), inset 0 0 20px rgba(0,255,136,0.03)',
             }}
           >
             {/* Row 1: Stats */}
             {/* PERSONEL */}
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center p-2 rounded-sm"
+              style={{ background: 'rgba(0,255,136,0.04)', border: '1px solid rgba(0,255,136,0.08)' }}>
               <StatPanel
                 label="PERSONEL"
                 value={totalPersonel}
@@ -298,7 +299,8 @@ export default function HomePage() {
             </div>
 
             {/* POS AKTIF */}
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center p-2 rounded-sm"
+              style={{ background: 'rgba(68,136,255,0.04)', border: '1px solid rgba(68,136,255,0.08)' }}>
               <StatPanel
                 label="POS AKTIF"
                 value={totalPos}
@@ -308,7 +310,8 @@ export default function HomePage() {
             </div>
 
             {/* INSIDEN */}
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center p-2 rounded-sm"
+              style={{ background: aktifCount > 0 ? 'rgba(255,68,68,0.05)' : 'rgba(0,255,136,0.04)', border: '1px solid rgba(0,255,136,0.08)' }}>
               <StatPanel
                 label="INSIDEN"
                 value={aktifCount}
@@ -488,19 +491,25 @@ function StatPanel({ label, value, color, pulse, compact }) {
         {pulse && (
           <span
             className="w-1.5 h-1.5 rounded-full animate-pulse"
-            style={{ background: color, boxShadow: `0 0 6px ${color}` }}
+            style={{ background: color, boxShadow: `0 0 8px ${color}` }}
           />
         )}
         <span
-          className={`font-bold font-mono ${compact ? 'text-base' : 'text-xl'}`}
-          style={{ color, textShadow: `0 0 10px ${color}80` }}
+          className={`font-bold font-mono tracking-tight ${compact ? 'text-lg' : 'text-2xl'}`}
+          style={{
+            color,
+            textShadow: `0 0 15px ${color}90`,
+          }}
         >
           {value.toLocaleString('id-ID')}
         </span>
       </div>
       <span
-        className={`tracking-[0.15em] uppercase font-medium ${compact ? 'text-[8px] mt-1' : 'text-[9px] tracking-[0.2em] mt-1.5'}`}
-        style={{ color: 'rgba(200,214,229,0.6)' }}
+        className={`tracking-[0.18em] uppercase font-semibold ${compact ? 'text-[7px] mt-1' : 'text-[9px] tracking-[0.25em] mt-1.5'}`}
+        style={{
+          color: 'rgba(200,214,229,0.55)',
+          letterSpacing: '0.15em',
+        }}
       >
         {label}
       </span>
@@ -517,33 +526,41 @@ function ActionPanel({ icon, label, onClick, color, badge, compact }) {
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className={`relative flex flex-col items-center justify-center rounded-sm transition-all duration-150 ${compact ? 'px-2 py-1' : 'px-4 py-2'}`}
+      className={`relative flex flex-col items-center justify-center rounded-sm transition-all duration-200 ${compact ? 'px-3 py-2' : 'px-4 py-2'}`}
       style={{
-        background: hovered ? `${color}20` : 'transparent',
-        border: `1px solid ${hovered ? color : 'rgba(0,255,136,0.1)'}`,
-        transform: hovered ? 'scale(1.05)' : 'scale(1)',
-        boxShadow: hovered ? `0 0 10px ${color}30` : 'none',
+        background: hovered ? `${color}15` : 'rgba(0,255,136,0.03)',
+        border: `1px solid ${hovered ? color : 'rgba(0,255,136,0.12)'}`,
+        transform: hovered ? 'scale(1.03)' : 'scale(1)',
+        boxShadow: hovered ? `0 0 15px ${color}25` : 'none',
+        transition: 'all 200ms cubic-bezier(0.23, 1, 0.32, 1)',
       }}
     >
       <div
-        className={`flex items-center justify-center ${compact ? 'w-4 h-4 mb-0.5' : 'w-6 h-6 mb-1.5'}`}
-        style={{ color, filter: hovered ? `drop-shadow(0 0 4px ${color})` : 'none' }}
+        className={`flex items-center justify-center ${compact ? 'w-5 h-5 mb-1' : 'w-6 h-6 mb-1.5'}`}
+        style={{
+          color: hovered ? color : 'rgba(0,255,136,0.7)',
+          filter: hovered ? `drop-shadow(0 0 6px ${color})` : 'none',
+          transition: 'all 200ms ease',
+        }}
       >
         {icon}
       </div>
       <span
-        className={`font-semibold uppercase ${compact ? 'text-[7px] tracking-[0.1em]' : 'text-[9px] tracking-[0.15em]'}`}
-        style={{ color }}
+        className={`font-semibold uppercase tracking-[0.12em] ${compact ? 'text-[7px]' : 'text-[9px]'}`}
+        style={{
+          color: hovered ? color : 'rgba(200,214,229,0.6)',
+          transition: 'color 200ms ease',
+        }}
       >
         {label}
       </span>
       {badge && (
         <span
-          className={`absolute rounded-full font-bold flex items-center justify-center animate-pulse ${compact ? '-top-0.5 -right-0.5 w-3 h-3 text-[6px]' : '-top-1 -right-1 w-4 h-4 text-[8px]'}`}
+          className={`absolute rounded-full font-bold flex items-center justify-center animate-pulse ${compact ? '-top-0.5 -right-0.5 w-3.5 h-3.5 text-[6px]' : '-top-1 -right-1 w-4 h-4 text-[8px]'}`}
           style={{
             background: 'var(--color-danger)',
             color: '#fff',
-            boxShadow: '0 0 6px var(--color-danger)',
+            boxShadow: `0 0 8px var(--color-danger)`,
           }}
         >
           {badge}
