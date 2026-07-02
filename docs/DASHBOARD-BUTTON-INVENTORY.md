@@ -1,6 +1,6 @@
 # DASHBOARD BUTTON INVENTORY
 Generated: 2026-07-02
-Updated: 2026-07-02 (v2)
+Updated: 2026-07-02 (v3 - Detailed POS Detail)
 
 ---
 
@@ -37,6 +37,7 @@ Updated: 2026-07-02 (v2)
 │   └── ActionButton "LAPORAN" (→ /laporan/kerawanan)
 │
 └── [Sidebar Navigation] - Collapsible (180px width)
+
     ├── NAVIGASI
     │   ├── a[href="/"] "Home"
     │   ├── a[href="/overview"] "Overview"
@@ -50,13 +51,433 @@ Updated: 2026-07-02 (v2)
     │   └── a[href="/laporan/tokoh"] "Tokoh Wilayah"
     │
     ├── 17 POS SATGAS
-    │   ├── a[href="/pos/KOTIS"] "KT - POS KOTIS"
-    │   ├── a[href="/pos/AJ"] "AJ - Pos Aji Kuning"
-    │   └── ... (all POS)
+    │   └── (POS list - expandable)
+    │
+    ├── PANDUAN INPUT
+    │   └── a[href="/panduan"] "Panduan Input"
     │
     └── PENGATURAN
-        ├── a[href="/panduan"] "Panduan Input"
         └── a[href="/admin"] "Pengaturan" (admin only)
+```
+
+---
+
+## POS DETAIL PAGE (`/pos/:posId`)
+
+### Header Section
+```
+[PosDetailPage]
+├── [Header]
+│   ├── [Breadcrumb]
+│   │   ├── button "← Kembali"
+│   │   ├── text "/"
+│   │   └── text "{posId}"
+│   │
+│   ├── [Title Block]
+│   │   ├── h2 "{Nama Pos}"
+│   │   └── p "{Desa} · {Kabupaten}"
+│   │
+│   ├── [Info Pills]
+│   │   ├── InfoPill label="Komandan" value="{nama}"
+│   │   ├── InfoPill label="Personel" value="{jumlah} org"
+│   │   ├── InfoPill label="Penduduk" value="{number}"
+│   │   ├── InfoPill label="Insiden" value="{count} aktif" (pulse if > 0)
+│   │   └── InfoPill label="Klasifikasi" value="{level} ({poin} poin)" (pulse if SIAGA)
+│   │
+│   └── button "📄 Laporan" (→ /laporan/pos/{posId})
+```
+
+### Tab Navigation (8 tabs - Left to Right)
+```
+├── [Tab Navigation]
+│   ├── button[role="tab"] "◆ INFO POS" (active indicator)
+│   ├── button[role="tab"] "◈ DEMOGRAFI"
+│   ├── button[role="tab"] "◬ GEO-DEMO-KONSOS"
+│   ├── button[role="tab"] "◉ TOKOH"
+│   ├── button[role="tab"] "◫ BINTER"
+│   ├── button[role="tab"] "⚠ DATA INSIDEN" (badge dot if count > 0)
+│   ├── button[role="tab"] "◎ PATROLI"
+│   └── button[role="tab"] "▣ DOKUMENTASI"
+```
+
+---
+
+### TAB 1: INFO POS
+
+```
+[INFO POS Tab Content]
+├── [Toolbar]
+│   └── button "✎ Edit Data Pos" (→ PosForm modal)
+│
+├── [Section: IDENTITAS POS]
+│   ├── row label="ID Pos" value="{pos_id}"
+│   ├── row label="Nama Pos" value="{nama_pos}"
+│   ├── row label="Lokasi Desa" value="{lokasi_desa}"
+│   ├── row label="Kecamatan" value="{kecamatan}"
+│   ├── row label="Kabupaten" value="{kabupaten}"
+│   ├── row label="Provinsi" value="{provinsi}"
+│   ├── row label="Koordinat" value="{lat}, {lng}"
+│   └── row label="Jumlah Patok" value="{jumlah} patok"
+│
+├── [Section: KOMANDAN & PERSONEL] (varies by POS type)
+│   │   (For KOTIS/KT:)
+│   │   ├── row label="Komandan Situs" value="{nama}"
+│   │   ├── row label="Pasi Intel" value="{nama}"
+│   │   ├── row label="Pasi Ops" value="{nama}"
+│   │   ├── row label="Pasi Minlog" value="{nama}"
+│   │   ├── row label="Pasi Ter" value="{nama}"
+│   │   ├── row label="Pabintal" value="{nama}"
+│   │   ├── row label="Pa Analis" value="{nama}"
+│   │   └── row label="Kekuatan Personel" value="{jumlah} orang"
+│   │   (For other POS:)
+│   │   ├── row label="Komandan Pos" value="{nama}"
+│   │   ├── row label="Danssk" value="{nama}"
+│   │   ├── row label="DPP" value="{nama}"
+│   │   └── row label="Kekuatan Personel" value="{jumlah} orang"
+│
+├── [Section: FASILITAS & INFRASTRUKTUR]
+│   ├── row label="Kondisi Bangunan" value="{kondisi}"
+│   ├── row label="Sumber Air" value="{sumber}"
+│   ├── row label="Sumber Listrik" value="{sumber}"
+│   └── row label="Jaringan GSM" value="{status}"
+│
+└── [Section: KERAWANAN UTAMA]
+    └── row label="Potensi Ancaman" value="{kerawanan}" (highlighted)
+```
+
+#### PosForm Modal (from Edit button)
+```
+[PosForm Modal]
+├── header "Edit Data Pos"
+├── button "✕" (close)
+├── [Form Fields]
+│   ├── input "ID Pos" (readonly)
+│   ├── input "Nama Pos"
+│   ├── input "Lokasi Desa"
+│   ├── input "Kecamatan"
+│   ├── input "Kabupaten"
+│   ├── input "Provinsi"
+│   ├── input "Latitude"
+│   ├── input "Longitude"
+│   ├── input "Komandan Pos"
+│   ├── input "Jumlah Patok"
+│   ├── input "Jumlah Personel"
+│   ├── select "Kondisi Bangunan"
+│   ├── select "Sumber Air"
+│   ├── select "Sumber Listrik"
+│   ├── select "Jaringan GSM"
+│   ├── textarea "Kerawanan Utama"
+│   └── (KOTIS/KT extra fields...)
+│       ├── input "Danssk"
+│       ├── input "DPP"
+│       ├── input "Komandan Situs"
+│       ├── input "Pasi Intel"
+│       ├── input "Pasi Ops"
+│       ├── input "Pasi Minlog"
+│       ├── input "Pasi Ter"
+│       ├── input "Pabintal"
+│       └── input "Pa Analis"
+└── [Footer]
+    ├── button "Batal"
+    └── button "Simpan"
+```
+
+---
+
+### TAB 2: DEMOGRAFI
+
+```
+[DEMOGRAFI Tab Content]
+├── [Toolbar]
+│   └── button "+ Tambah Data"
+│
+├── [Summary Cards] (if data exists)
+│   ├── card "Total Penduduk" value="{number}"
+│   ├── card "Total KK" value="{number}"
+│   └── card "Persentase" charts
+│
+├── [Religi Stats]
+│   ├── stat "Islam" value="{number}" percentage="{percent}%"
+│   ├── stat "Kristen" value="{number}" percentage="{percent}%"
+│   ├── stat "Katolik" value="{number}" percentage="{percent}%"
+│   ├── stat "Hindu" value="{number}" percentage="{percent}%"
+│   ├── stat "Buddha" value="{number}" percentage="{percent}%"
+│   ├── stat "Konghucu" value="{number}" percentage="{percent}%"
+│   └── stat "Lainnya" value="{number}" percentage="{percent}%"
+│
+├── [Fasilitas Ibadah]
+│   ├── stat "Masjid" value="{number}"
+│   ├── stat "Gereja" value="{number}"
+│   ├── stat "Pura" value="{number}"
+│   ├── stat "Vihara" value="{number}"
+│   └── stat "Konghucu" value="{number}"
+│
+├── [Data Table] (if data exists)
+│   ├── table header row
+│   ├── table data row(s)
+│   │   ├── column "{kategori}"
+│   │   ├── column "{jumlah}"
+│   │   └── button[Edit] button[Delete]
+│   └── pagination (if many rows)
+│
+└── [Empty State] (if no data)
+    └── text "Data demografi belum tersedia"
+        └── button "+ Isi Data Demografi"
+```
+
+#### DemografiEditForm Modal
+```
+[DemografiEditForm Modal]
+├── header "Edit Data Demografi"
+├── button "✕" (close)
+├── [Form Fields]
+│   ├── input "Total Penduduk"
+│   ├── input "Total KK"
+│   ├── input "Islam"
+│   ├── input "Kristen"
+│   ├── input "Katolik"
+│   ├── input "Hindu"
+│   ├── input "Buddha"
+│   ├── input "Konghucu"
+│   ├── input "Lainnya"
+│   ├── input "Masjid"
+│   ├── input "Gereja"
+│   ├── input "Pura"
+│   └── input "Vihara"
+└── [Footer]
+    ├── button "Batal"
+    └── button "Simpan"
+```
+
+---
+
+### TAB 3: GEO-DEMO-KONSOS
+
+```
+[GEO-DEMO-KONSOS Tab Content]
+├── [Map Container]
+│   ├── [Leaflet Map]
+│   │   ├── GeoJSON polygons overlay
+│   │   └── [Marker] at POS coordinate
+│   ├── button[zoom in]
+│   ├── button[zoom out]
+│   └── [Layer Controls]
+│
+├── [Konsos Data Visualization]
+│   ├── text "DATA KONSOS"
+│   ├── table/list of konsos entries
+│   └── stat summaries
+│
+└── [Legend/Info Panel]
+    └── color indicators for geo zones
+```
+
+---
+
+### TAB 4: TOKOH
+
+```
+[TOKOH Tab Content]
+├── [Toolbar]
+│   └── button "+ Tambah Tokoh"
+│
+├── [Tokoh List] (cards layout)
+│   ├── [TokohCard] (per item)
+│   │   ├── img "{foto}"
+│   │   ├── text "{nama}"
+│   │   ├── text "{jabatan}"
+│   │   ├── text "{alamat}"
+│   │   ├── text "{no_hp}"
+│   │   └── [Actions]
+│   │       ├── button[Edit]
+│   │       └── button[Hapus]
+│   │
+│   └── ... (more cards)
+│
+└── [Empty State] (if no data)
+    └── text "Belum ada tokoh"
+```
+
+#### TokohForm Modal
+```
+[TokohForm Modal]
+├── header "{isEdit ? 'Edit' : 'Tambah'} Tokoh"
+├── button "✕" (close)
+├── [Form Fields]
+│   ├── input "Nama Lengkap" *
+│   ├── input "NIK"
+│   ├── input "Jabatan"
+│   ├── textarea "Alamat"
+│   ├── input "No. HP"
+│   ├── input "Foto URL"
+│   ├── input "Keterangan"
+│   └── select "Status" (Aktif/Nonaktif)
+└── [Footer]
+    ├── button "Batal"
+    └── button "Simpan"
+```
+
+---
+
+### TAB 5: BINTER
+
+```
+[BINTER Tab Content]
+├── [Filter Bar]
+│   ├── input[search] "Cari..."
+│   ├── select "Jenis Binter"
+│   │   └── options: [All, Gotong Royong, Peresmian,军民迎春,...]
+│   ├── select "Tahun"
+│   └── button "Reset"
+│
+├── [Binter Timeline] (grouped by date)
+│   ├── [DateGroup] "Juli 2026"
+│   │   ├── [BinterCard]
+│   │   │   ├── img "{foto}"
+│   │   │   ├── text "{jenis}"
+│   │   │   ├── text "{tanggal}"
+│   │   │   ├── text "{lokasi}"
+│   │   │   ├── text "{keterangan}"
+│   │   │   └── [Actions]
+│   │   │       ├── button[Edit]
+│   │   │       └── button[Hapus]
+│   │   └── ... (more cards)
+│   └── ... (more date groups)
+│
+└── [Empty State] (if no data)
+    └── text "Belum ada program Binter"
+```
+
+#### BinterForm Modal
+```
+[BinterForm Modal]
+├── header "{isEdit ? 'Edit' : 'Tambah'} Program Binter"
+├── button "✕" (close)
+├── [Form Fields]
+│   ├── select "Jenis Binter" *
+│   ├── input "Tanggal" *
+│   ├── textarea "Lokasi"
+│   ├── textarea "Keterangan"
+│   └── input "Foto URL"
+└── [Footer]
+    ├── button "Batal"
+    └── button "Simpan"
+```
+
+---
+
+### TAB 6: DATA INSIDEN (Kerawanan)
+
+```
+[DATA INSIDEN Tab Content]
+├── [Summary Bar]
+│   ├── text "Total Poin: {poin}"
+│   ├── badge "{level}" (AMAN/SIAGA/WASPADA)
+│   └── button "+ Tambah Insiden"
+│
+├── [Kerawanan List]
+│   ├── [KerawananCard] (per item)
+│   │   ├── icon "{kategori_icon}"
+│   │   ├── text "{kategori}"
+│   │   ├── text "{deskripsi}"
+│   │   ├── text "{tanggal}"
+│   │   ├── badge "{status}" (AKTIF/SELESAI)
+│   │   │   └── (pulse animation if AKTIF)
+│   │   ├── button[Toggle Status] (AKTIF↔SELESAI)
+│   │   ├── button[Edit]
+│   │   └── button[Hapus]
+│   │
+│   └── ... (more cards)
+│
+└── [Empty State] (if no data)
+    └── text "Belum ada laporan kerawanan"
+```
+
+#### KerawananForm Modal
+```
+[KerawananForm Modal]
+├── header "{isEdit ? 'Edit' : 'Tambah'} Laporan Kerawanan"
+├── button "✕" (close)
+├── [Form Fields]
+│   ├── select "Kategori" *
+│   │   └── options: [Bentrok Antar Suku, Perampokan, Penyusupan,...]
+│   ├── textarea "Deskripsi" *
+│   ├── input "Tanggal" *
+│   ├── input "Korban"
+│   ├── select "Status" (Aktif/Selesai)
+│   └── textarea "Keterangan"
+└── [Footer]
+    ├── button "Batal"
+    └── button "Simpan"
+```
+
+---
+
+### TAB 7: PATROLI
+
+```
+[PATROLI Tab Content]
+├── [Filter Bar]
+│   ├── input[search] "Cari..."
+│   ├── select "Jenis Patroli"
+│   │   └── options: [All, Patroli Patok, Patroli Rutin, Patroli Malam,...]
+│   ├── select "Bulan"
+│   └── button "Reset"
+│
+├── [Patroli Timeline] (grouped by date)
+│   ├── [DateGroup] "Juli 2026"
+│   │   ├── [PatroliCard]
+│   │   │   ├── text "{jenis}"
+│   │   │   ├── text "{tanggal}"
+│   │   │   ├── text "{personel}"
+│   │   │   ├── text "{lokasi}"
+│   │   │   ├── img "{foto}" (thumbnail)
+│   │   │   └── [Actions]
+│   │   │       ├── button[View Full]
+│   │   │       ├── button[Edit]
+│   │   │       └── button[Hapus]
+│   │   └── ... (more cards)
+│   └── ... (more date groups)
+│
+└── [Empty State] (if no data)
+    └── text "Belum ada data patroli"
+```
+
+#### PatroliForm Modal
+```
+[PatroliForm Modal]
+├── header "{isEdit ? 'Edit' : 'Tambah'} Patroli"
+├── button "✕" (close)
+├── [Form Fields]
+│   ├── select "Jenis Patroli" *
+│   ├── input "Tanggal" *
+│   ├── input "Personel"
+│   ├── textarea "Lokasi"
+│   ├── textarea "Keterangan"
+│   └── input "Foto URL"
+└── [Footer]
+    ├── button "Batal"
+    └── button "Simpan"
+```
+
+---
+
+### TAB 8: DOKUMENTASI
+
+```
+[DOKUMENTASI Tab Content]
+├── [Upload Section]
+│   ├── input "Google Drive URL"
+│   ├── button "Tambah"
+│   └── [Error/Status message]
+│
+├── [Photo Gallery Grid]
+│   ├── img "{thumbnail}"
+│   ├── img "{thumbnail}"
+│   └── ... (more images)
+│
+└── [Empty State] (if no URLs)
+    └── text "Belum ada dokumentasi"
 ```
 
 ---
@@ -87,98 +508,6 @@ Updated: 2026-07-02 (v2)
 
 ---
 
-## POS DETAIL PAGE (`/pos/:posId`)
-```
-[PosDetailPage]
-├── [Header]
-│   ├── button[Kembali] "← Kembali"
-│   └── button[Cetak Laporan] "📄 Cetak / Simpan PDF"
-│
-├── [Info Pills]
-│   ├── InfoPill "Komandan"
-│   ├── InfoPill "Personel"
-│   ├── InfoPill "Penduduk"
-│   ├── InfoPill "Insiden"
-│   └── InfoPill "Klasifikasi"
-│
-└── [Content Area]
-    ├── [Tab Navigation] - Urutan Kiri ke Kanan:
-    │   ├── button[role="tab"] "INFO POS"
-    │   ├── button[role="tab"] "DEMOGRAFI"
-    │   ├── button[role="tab"] "GEO-DEMO-KONSOS"
-    │   ├── button[role="tab"] "TOKOH"
-    │   ├── button[role="tab"] "BINTER"
-    │   ├── button[role="tab"] "DATA INSIDEN"
-    │   ├── button[role="tab"] "PATROLI"
-    │   └── button[role="tab"] "DOKUMENTASI"
-    │
-    └── [Tab Content]
-        ├── [INFO POS]
-        │   ├── button[Edit Pos] "✎ Edit"
-        │   └── map placeholder
-        │
-        ├── [DEMOGRAFI]
-        │   ├── [DemografiTable]
-        │   │   ├── button[Tambah Data]
-        │   │   ├── button[Edit Row] (per row)
-        │   │   └── button[Delete Row] (per row)
-        │   └── [EditDemografiForm] (modal)
-        │       ├── input fields
-        │       ├── button[Batal]
-        │       └── button[Simpan]
-        │
-        ├── [GEO-DEMO-KONSOS]
-        │   └── [GeoDemoKonsos]
-        │       ├── GeoJSON map
-        │       └── Konsos data visualization
-        │
-        ├── [TOKOH]
-        │   ├── [TokohList]
-        │   │   ├── button[Tambah Tokoh]
-        │   │   ├── button[Edit Tokoh] (per card)
-        │   │   └── button[Hapus Tokoh] (per card)
-        │   └── [TokohForm] (modal)
-        │       ├── input fields
-        │       ├── button[Batal]
-        │       └── button[Simpan]
-        │
-        ├── [BINTER]
-        │   ├── [BinterList]
-        │   │   ├── button[Tambah Binter]
-        │   │   ├── button[Edit Binter] (per row)
-        │   │   └── button[Hapus Binter] (per row)
-        │   └── [BinterForm] (modal)
-        │       ├── input fields
-        │       ├── button[Batal]
-        │       └── button[Simpan]
-        │
-        ├── [DATA INSIDEN]
-        │   ├── [KerawananList]
-        │   │   ├── button[Tambah Insiden]
-        │   │   ├── button[Edit Insiden] (per card)
-        │   │   └── button[Hapus Insiden] (per card)
-        │   └── [KerawananForm] (modal)
-        │       ├── input fields
-        │       ├── button[Batal]
-        │       └── button[Simpan]
-        │
-        ├── [PATROLI]
-        │   ├── [PatroliList]
-        │   │   ├── button[Tambah Patroli]
-        │   │   ├── button[Edit Patroli] (per row)
-        │   │   └── button[Hapus Patroli] (per row)
-        │   └── [PatroliForm] (modal)
-        │       ├── input fields
-        │       ├── button[Batal]
-        │       └── button[Simpan]
-        │
-        └── [DOKUMENTASI]
-            └── [PhotoGallery]
-                └── Image grid with lightbox
-```
-
----
-
 ## INSIDEN PAGE (`/insiden`)
 ```
 [InsidenPage]
@@ -186,20 +515,26 @@ Updated: 2026-07-02 (v2)
 │   └── button[Download PDF]
 │
 ├── [Filter Controls]
-│   ├── select[Status]
-│   ├── select[Timeline]
-│   ├── input[search]
+│   ├── select[Status] (All/Aktif/Selesai)
+│   ├── select[Timeline] (Bulan/Tahun)
+│   ├── input[search] "Cari..."
 │   └── button[Reset Filter]
 │
 ├── [Insiden List]
 │   ├── [InsidenCard] (per item)
-│   │   ├── button[View Detail]
-│   │   ├── button[Edit]
-│   │   └── button[Delete]
+│   │   ├── badge "{kategori}"
+│   │   ├── text "{deskripsi}"
+│   │   ├── text "{tanggal}"
+│   │   ├── text "{pos}"
+│   │   ├── badge "{status}"
+│   │   └── [Actions]
+│   │       ├── button[View Detail]
+│   │       ├── button[Edit]
+│   │       └── button[Delete]
 │   └── ... (more cards)
 │
-└── [Add Insiden Button]
-    └── button[Tambah Insiden]
+└── [Add Button]
+    └── button "+ Tambah Insiden"
 ```
 
 ---
@@ -208,19 +543,24 @@ Updated: 2026-07-02 (v2)
 ```
 [BinterPage]
 ├── [Header]
-│   ├── select[Timeline Filter]
+│   ├── select[Timeline Filter] (Bulan/Tahun)
 │   ├── select[Jenis Binter]
 │   ├── input[search]
 │   └── button[Download PDF]
 │
 ├── [Binter Timeline/Grid]
 │   ├── [BinterCard] (per item)
-│   │   ├── button[View Detail]
-│   │   └── button[Edit]
+│   │   ├── img "{foto}"
+│   │   ├── text "{jenis}"
+│   │   ├── text "{tanggal}"
+│   │   ├── text "{lokasi}"
+│   │   └── [Actions]
+│   │       ├── button[View Detail]
+│   │       └── button[Edit]
 │   └── ... (more cards)
 │
-└── [Add Binter Button]
-    └── button[Tambah Binter]
+└── [Add Button]
+    └── button "+ Tambah Binter"
 ```
 
 ---
@@ -229,23 +569,44 @@ Updated: 2026-07-02 (v2)
 ```
 [AdminPage]
 ├── [Header]
-│   └── button[Tambah User]
+│   └── button "+ Tambah User"
 │
 ├── [User Management]
-│   ├── [User List]
-│   │   ├── button[Edit User] (per row)
-│   │   └── button[Delete User] (per row)
-│   └── [User Form] (modal)
-│       ├── input fields
-│       ├── select[Role]
-│       ├── button[Batal]
-│       └── button[Simpan]
+│   ├── [User List Table]
+│   │   ├── column "Nama"
+│   │   ├── column "Email"
+│   │   ├── column "Role"
+│   │   ├── column "Aksi"
+│   │   └── row (per user)
+│   │       ├── text "{nama}"
+│   │       ├── text "{email}"
+│   │       ├── badge "{role}"
+│   │       └── [Actions]
+│   │           ├── button[Edit]
+│   │           └── button[Hapus]
+│   │
+│   └── pagination
 │
-└── [Role Filter]
-    ├── button[All]
-    ├── button[Admin]
-    ├── button[Operator]
-    └── button[Viewer]
+└── [Role Filter Tabs]
+    ├── button "All"
+    ├── button "Admin"
+    ├── button "Operator"
+    └── button "Viewer"
+```
+
+#### UserForm Modal
+```
+[UserForm Modal]
+├── header "{isEdit ? 'Edit' : 'Tambah'} User"
+├── button "✕" (close)
+├── [Form Fields]
+│   ├── input "Nama Lengkap"
+│   ├── input "Email"
+│   ├── select "Role" (Admin/Operator/Viewer)
+│   └── input[password] "Password" (new user only)
+└── [Footer]
+    ├── button "Batal"
+    └── button "Simpan"
 ```
 
 ---
@@ -254,12 +615,12 @@ Updated: 2026-07-02 (v2)
 ```
 [PanduanPage]
 ├── [Tab Navigation]
-│   ├── button[Data Pos]
-│   ├── button[Demografi]
-│   ├── button[Tokoh]
-│   ├── button[Binter]
-│   ├── button[Kerawanan]
-│   └── button[Patroli]
+│   ├── button "Data Pos"
+│   ├── button "Demografi"
+│   ├── button "Tokoh"
+│   ├── button "Binter"
+│   ├── button "Kerawanan"
+│   └── button "Patroli"
 │
 └── [Content Area]
     └── SOP sections (read-only)
@@ -271,10 +632,13 @@ Updated: 2026-07-02 (v2)
 ```
 [GrafikKerawananPage]
 ├── [Header]
-│   └── button[Download PDF]
+│   ├── select[Filter by POS]
+│   └── button "📄 Download PDF"
 │
-└── [Chart Area]
-    └── Interactive charts (filterable)
+├── [Chart Area]
+│   ├── [Kerawanan Trend Chart]
+│   ├── [Kerawanan by Category]
+│   └── [Kerawanan Map]
 ```
 
 ---
@@ -283,69 +647,53 @@ Updated: 2026-07-02 (v2)
 ```
 [TokohWilayahPage]
 ├── [Header]
-│   └── button[Download PDF]
+│   ├── button "📄 Download PDF"
+│   └── button "🔍 Filter"
 │
-├── [Filter]
+├── [Filter Panel]
 │   └── select[Filter by Pos]
 │
 └── [Tokoh List Table]
-    └── Read-only table
-```
-
----
-
-## LAPORAN DEMOGRAFI (`/laporan/demografi`)
-```
-[DataDemografiPage]
-├── [Header]
-│   └── button[Download PDF]
-│
-└── [Demografi Data]
-    └── Read-only data tables
-```
-
----
-
-## LAPORAN POS (`/laporan/pos/:posId`)
-```
-[LaporanPosPage]
-├── [Header]
-│   ├── button[← Kembali ke Pos]
-│   └── button[Cetak / Simpan PDF]
-│
-└── [Report Content]
-    └── Print-ready report (read-only)
+    ├── column "Nama"
+    ├── column "Jabatan"
+    ├── column "Alamat"
+    ├── column "No. HP"
+    └── row (per tokoh)
 ```
 
 ---
 
 ## MODAL COMPONENTS
 
-### [Modal]
+### Modal
 ```
 [Modal]
 ├── backdrop (click to close)
+├── header (title)
 ├── button[X] "✕" (close)
-├── header
 └── content slot
 ```
 
-### [ConfirmDialog]
+### ConfirmDialog
 ```
 [ConfirmDialog]
 ├── backdrop
 ├── button[X] "✕"
-├── title
-├── message
-├── button[Batal]
-└── button[Konfirmasi]
+├── [Icon] (danger/warning/info)
+├── title "{type}"
+├── message "{question}"
+├── button "Batal"
+└── button "{confirmLabel}"
 ```
 
-### [Toast]
+### Toast
 ```
-[Toast]
-├── Toast container (fixed position)
-└── Toast messages (auto-dismiss)
+[Toast Container] (fixed position bottom-right)
+├── [Toast] (per notification)
+│   ├── [Icon] (success/error/warning/info)
+│   ├── title "{optional}"
+│   ├── message "{text}"
+│   └── button[X] (dismiss)
 ```
 
 ---
@@ -353,12 +701,14 @@ Updated: 2026-07-02 (v2)
 ## TOPBAR (All Pages)
 ```
 [TopBar]
-├── button[sidebar toggle] (mobile)
-├── span[NARASINGA]
-├── span[date/time]
+├── button[Buka Sidebar] (mobile only)
+├── text "NARASINGA"
+├── [DateTime]
+│   ├── text "HH.MM.SS" (live clock)
+│   └── text "HARI, DD MONTH YYYY"
 ├── button[presentation mode]
 ├── button[fullscreen]
-├── button[print]
+├── button[print/export PDF]
 └── button[logout]
 ```
 
@@ -368,12 +718,13 @@ Updated: 2026-07-02 (v2)
 
 Untuk report bug, sebutkan:
 1. Halaman (page URL)
-2. Lokasi tombol (dari tree di atas)
-3. Deskripsi masalah
-4. Expected behavior
-5. Actual behavior
+2. Tab yang aktif
+3. Lokasi tombol (dari tree di atas)
+4. Deskripsi masalah
+5. Expected behavior
+6. Actual behavior
 
 ---
 
 *Generated: 2026-07-02*
-*Updated: 2026-07-02 (v2 - Fixed POS Detail tabs structure)*
+*Updated: 2026-07-02 (v3 - Complete POS Detail tree with all tabs, modals, forms)*
